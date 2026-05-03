@@ -1,6 +1,6 @@
-from rest_framework.decorators import api_view  # type: ignore[reportMissingImports]
-from rest_framework.response import Response  # type: ignore[reportMissingImports]
-from rest_framework import status  # type: ignore[reportMissingImports]
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from .models import Expense
 from .serializers import ExpenseSerializer
 
