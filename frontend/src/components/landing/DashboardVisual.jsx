@@ -52,13 +52,6 @@ export const DashboardVisual = () => (
               </div>
             ))}
           </div>
-
-          <button className="mt-16 group flex items-center gap-4 text-white hover:text-emerald-400 transition-colors">
-            <span className="text-xs font-black uppercase tracking-[0.3em]">Explore the Core Protocol</span>
-            <div className="w-10 h-10 flex items-center justify-center rounded-full border border-white/10 group-hover:border-emerald-500 group-hover:bg-emerald-500/10 transition-all">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </button>
         </div>
 
       </div>
