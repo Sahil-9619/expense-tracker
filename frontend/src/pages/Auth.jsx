@@ -21,9 +21,9 @@ export default function Auth({ onLogin }) {
           <img
             src="/images/auth_bg.png"
             alt="Security Background"
-            className="w-full h-full object-cover opacity-10 scale-105 group-hover:scale-100 transition-transform duration-[2s]"
+            className="w-full h-full object-cover opacity-25 dark:opacity-10 scale-105 group-hover:scale-100 transition-transform duration-[2s]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-color)] via-[var(--bg-color)]/20 to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-color)] via-[var(--bg-color)]/20 to-transparent opacity-75 dark:opacity-95" />
         </div>
 
         {/* Content Overlay */}
@@ -53,7 +53,7 @@ export default function Auth({ onLogin }) {
                   <span className="text-emerald-500">Wealth</span> With <br />
                   Precision.
                 </h2>
-                <p className="mt-6 text-base text-[var(--text-secondary)] max-w-sm leading-relaxed font-medium opacity-80">
+                <p className="mt-6 text-base text-[var(--text-secondary)] max-w-sm leading-relaxed font-medium">
                   A software to manage your expenses with ease and precision.
                 </p>
               </motion.div>
@@ -66,11 +66,11 @@ export default function Auth({ onLogin }) {
               >
                 <div>
                   <p className="text-3xl font-black text-[var(--text-primary)]">Free &</p>
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)] font-bold mt-1.5 opacity-60">Efficient</p>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)] font-bold mt-1.5">Efficient</p>
                 </div>
                 <div>
                   <p className="text-3xl font-black text-[var(--text-primary)]">Easy and</p>
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)] font-bold mt-1.5 opacity-60">Encrypted</p>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)] font-bold mt-1.5">Encrypted</p>
                 </div>
               </motion.div>
             </div>
