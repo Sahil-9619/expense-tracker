@@ -46,14 +46,14 @@ export default function ThreeDMarqueeDemo() {
             </p>
 
             <div className="relative z-10 flex flex-wrap items-center justify-center gap-4">
-                <Link to="/auth"
-                    className="group relative z-[110] inline-flex items-center justify-center overflow-hidden rounded-lg px-6 py-3 sm:px-8 sm:py-4 text-[9px] sm:text-xs font-bold tracking-[0.2em] text-white backdrop-blur-xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-105 active:scale-95"
+                <Link to="/auth?mode=signup"
+                    className="group relative z-[110] inline-flex items-center justify-center overflow-hidden rounded-full px-6 py-3 sm:px-8 sm:py-4 text-[9px] sm:text-xs font-bold tracking-[0.2em] text-white backdrop-blur-xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
                     {/* Glass Base */}
-                    <span className="pointer-events-none absolute inset-0 rounded-lg bg-white/10 backdrop-blur-xl border border-white/20 transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40"></span>
+                    <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 transition-all duration-300 group-hover:bg-white/20 group-hover:border-white/40"></span>
 
                     {/* Gradient Tint */}
-                    <span className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-60 group-hover:opacity-80 transition-all duration-300"></span>
+                    <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-60 group-hover:opacity-80 transition-all duration-300"></span>
 
                     {/* Shine Sweep */}
                     <span className="pointer-events-none absolute top-0 left-[-120%] h-full w-1/2 bg-white/40 blur-md transition-all duration-700 ease-out group-hover:left-[130%]"></span>

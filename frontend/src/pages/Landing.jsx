@@ -10,16 +10,16 @@ import { Footer } from '../components/landing/Footer';
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#030712] text-white selection:bg-emerald-500/30 overflow-x-hidden font-sans relative">
+    <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-primary)] selection:bg-emerald-500/30 overflow-x-hidden font-sans relative transition-colors duration-500">
       {/* Aceternity-style Grid of Uncertainty Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         {/* Base Grid */}
         <div 
-          className="absolute inset-0 opacity-[0.15]" 
+          className="absolute inset-0 opacity-[0.1]" 
           style={{ 
             backgroundImage: `
-              linear-gradient(to right, #10b981 1px, transparent 1px),
-              linear-gradient(to bottom, #10b981 1px, transparent 1px)
+              linear-gradient(to right, var(--accent-color) 1px, transparent 1px),
+              linear-gradient(to bottom, var(--accent-color) 1px, transparent 1px)
             `,
             backgroundSize: '35px 35px'
           }} 
@@ -27,10 +27,10 @@ export default function Landing() {
         
         {/* Large Radial Fade Mask */}
         <div 
-          className="absolute inset-0 bg-[#030712]" 
+          className="absolute inset-0 bg-[var(--bg-color)]" 
           style={{ 
-            maskImage: 'radial-gradient(circle at 50% 50%, transparent 0%, #030712 85%)',
-            WebkitMaskImage: 'radial-gradient(circle at 50% 50%, transparent 0%, #030712 85%)'
+            maskImage: 'radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-color) 85%)',
+            WebkitMaskImage: 'radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-color) 85%)'
           }} 
         />
 
@@ -39,8 +39,8 @@ export default function Landing() {
           className="absolute inset-0 opacity-[0.05]" 
           style={{ 
             backgroundImage: `
-              linear-gradient(to right, #10b981 1px, transparent 1px),
-              linear-gradient(to bottom, #10b981 1px, transparent 1px)
+              linear-gradient(to right, var(--accent-color) 1px, transparent 1px),
+              linear-gradient(to bottom, var(--accent-color) 1px, transparent 1px)
             `,
             backgroundSize: '175px 175px'
           }} 
