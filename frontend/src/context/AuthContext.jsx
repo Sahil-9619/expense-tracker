@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginUser, registerUser } from '../api/auth';
+import { loginUser, registerUser } from '../services/auth.service';
 
 const AuthContext = createContext();
 
@@ -41,9 +41,6 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const data = await registerUser({ name, email, password });
-            // Signup usually logs the user in directly or requires a separate login
-            // Based on the backend views, signup returns the user but NO tokens.
-            // So we might need to call login after signup or just notify success.
             return data;
         } catch (err) {
             setError(err.message);

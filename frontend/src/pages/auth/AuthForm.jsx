@@ -14,14 +14,21 @@ export const AuthForm = ({ onLogin }) => {
     const [type, setType] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
     const [showPassword, setShowPassword] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
-    const [formData, setFormData] = useState({
+    
+    // Separate states for Login and Signup to prevent cross-filling
+    const [loginData, setLoginData] = useState({
+        email: "",
+        password: ""
+    });
+
+    const [signupData, setSignupData] = useState({
         name: "",
         email: "",
         password: "",
         confirmPassword: ""
     });
 
-    const { login, register, loading, error, setError } = useAuth();
+    const { login, register, loading, setError } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,21 +43,34 @@ export const AuthForm = ({ onLogin }) => {
     const toggleType = (newType) => {
         if (newType !== type) {
             setType(newType);
-            setTermsAccepted(false); // Reset on switch
+            setTermsAccepted(false);
             setError(null);
+            setShowPassword(false);
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+    const handleLoginChange = (e) => {
+        setLoginData({ ...loginData, [e.target.id]: e.target.value });
     };
 
-    const resetForm = () => {
-        setFormData({
+    const handleSignupChange = (e) => {
+        setSignupData({ ...signupData, [e.target.id]: e.target.value });
+    };
+
+    const resetSignupForm = () => {
+        setSignupData({
             name: "",
             email: "",
             password: "",
             confirmPassword: ""
+        });
+        setTermsAccepted(false);
+    };
+
+    const resetLoginForm = () => {
+        setLoginData({
+            email: "",
+            password: ""
         });
     };
 
@@ -63,24 +83,35 @@ export const AuthForm = ({ onLogin }) => {
                 toast.error("Please accept the terms and conditions");
                 return;
             }
-            if (formData.password !== formData.confirmPassword) {
+            if (signupData.password !== signupData.confirmPassword) {
                 toast.error("Passwords do not match");
                 return;
             }
             try {
-                await register(formData.name, formData.email, formData.password);
-                toast.success("Account created successfully! Please login.");
+                await register(signupData.name, signupData.email, signupData.password);
+                toast.success("Account created successfully! Please login with your credentials.");
+                
+                // CLEAR Signup Form
+                resetSignupForm();
+                
+                // SWITCH to Login Mode
                 setType("login");
-                resetForm();
             } catch (err) {
                 toast.error(err.message || "Registration failed");
             }
         } else {
             try {
-                await login(formData.email, formData.password);
+                await login(loginData.email, loginData.password);
                 toast.success("Login successful! Welcome back.");
-                resetForm();
-                navigate("/dashboard");
+                
+                // CLEAR Login Form
+                resetLoginForm();
+
+                if (onLogin) {
+                    onLogin();
+                } else {
+                    navigate("/dashboard");
+                }
             } catch (err) {
                 toast.error(err.message || "Login failed");
             }
@@ -89,8 +120,6 @@ export const AuthForm = ({ onLogin }) => {
 
     return (
         <div className="w-full max-w-[380px] mx-auto rounded-[2.5rem] p-4 sm:p-6 relative backdrop-blur-none transition-colors duration-500">
-            {/* Background effects removed for transparency */}
-
             <div className="flex flex-col items-center mb-5 sm:mb-6">
                 <motion.h2
                     key={type + "-title"}
@@ -113,7 +142,6 @@ export const AuthForm = ({ onLogin }) => {
                 </motion.p>
             </div>
 
-            {/* Custom Slider Toggle */}
             <div className="relative flex w-full h-10 bg-[var(--card-bg)] rounded-full p-1 mb-5 sm:mb-6 border border-[var(--card-border)]">
                 <motion.div
                     className="absolute inset-y-1 bg-emerald-600 rounded-full shadow-lg shadow-emerald-600/20"
@@ -144,8 +172,6 @@ export const AuthForm = ({ onLogin }) => {
                 </button>
             </div>
 
-            {/* Error display removed in favor of Sonner toasts */}
-
             <form className="space-y-3" onSubmit={handleSubmit}>
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -156,45 +182,74 @@ export const AuthForm = ({ onLogin }) => {
                         transition={{ duration: 0.2 }}
                         className="space-y-3"
                     >
-                        {type === "signup" && (
-                            <LabelInputContainer>
-                                <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" placeholder="John Doe" type="text" icon={HiOutlineUser} value={formData.name} onChange={handleChange} required />
-                            </LabelInputContainer>
-                        )}
+                        {type === "signup" ? (
+                            <>
+                                <LabelInputContainer>
+                                    <Label htmlFor="name">Full Name</Label>
+                                    <Input id="name" placeholder="John Doe" type="text" icon={HiOutlineUser} value={signupData.name} onChange={handleSignupChange} required />
+                                </LabelInputContainer>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} value={formData.email} onChange={handleChange} required />
-                        </LabelInputContainer>
+                                <LabelInputContainer>
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} value={signupData.email} onChange={handleSignupChange} required />
+                                </LabelInputContainer>
 
-                        <LabelInputContainer>
-                            <Label htmlFor="password">Password</Label>
-                            <div className="relative group">
-                                <Input
-                                    id="password"
-                                    placeholder="••••••••"
-                                    type={showPassword ? "text" : "password"}
-                                    icon={HiOutlineLockClosed}
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
-                                >
-                                    {showPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
-                                </button>
-                            </div>
-                        </LabelInputContainer>
+                                <LabelInputContainer>
+                                    <Label htmlFor="password">Password</Label>
+                                    <div className="relative group">
+                                        <Input
+                                            id="password"
+                                            placeholder="••••••••"
+                                            type={showPassword ? "text" : "password"}
+                                            icon={HiOutlineLockClosed}
+                                            value={signupData.password}
+                                            onChange={handleSignupChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
+                                        >
+                                            {showPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </LabelInputContainer>
 
-                        {type === "signup" && (
-                            <LabelInputContainer>
-                                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={formData.confirmPassword} onChange={handleChange} required />
-                            </LabelInputContainer>
+                                <LabelInputContainer>
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={signupData.confirmPassword} onChange={handleSignupChange} required />
+                                </LabelInputContainer>
+                            </>
+                        ) : (
+                            <>
+                                <LabelInputContainer>
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} value={loginData.email} onChange={handleLoginChange} required />
+                                </LabelInputContainer>
+
+                                <LabelInputContainer>
+                                    <Label htmlFor="password">Password</Label>
+                                    <div className="relative group">
+                                        <Input
+                                            id="password"
+                                            placeholder="••••••••"
+                                            type={showPassword ? "text" : "password"}
+                                            icon={HiOutlineLockClosed}
+                                            value={loginData.password}
+                                            onChange={handleLoginChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
+                                        >
+                                            {showPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </LabelInputContainer>
+                            </>
                         )}
 
                         <div className="flex items-center justify-between px-1">
@@ -212,13 +267,13 @@ export const AuthForm = ({ onLogin }) => {
                                             termsAccepted ? "opacity-100 scale-100" : "opacity-0 scale-0 group-hover/check:opacity-40"
                                         )} />
                                     </div>
-                                    <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-secondary)] select-none opacity-90">
-                                        I agree to <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>terms</a> and <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>condition</a>
+                                    <span className="text-[10px] uppercase tracking-[0.15em] font-black text-[var(--text-secondary)] select-none opacity-90">
+                                        I agree to <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>terms</a> and <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>conditions</a>
                                     </span>
                                 </div>
                             ) : (
                                 <div className="w-full flex justify-end">
-                                    <button type="button" className="text-[8px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
+                                    <button type="button" className="text-[10px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
                                         Forgot Password?
                                     </button>
                                 </div>

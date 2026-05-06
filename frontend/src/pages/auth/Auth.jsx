@@ -1,22 +1,18 @@
 import React from 'react';
 import { HiOutlineSparkles, HiOutlineShieldCheck } from 'react-icons/hi2';
-import { AuthForm } from '../components/auth/AuthForm';
+import { AuthForm } from './AuthForm';
 import { motion } from 'motion/react';
-import { Boxes } from '../components/UI/background-boxes';
-import { GridPattern } from '../components/ui/grid-pattern';
-import { AnimatedThemeToggler } from '../components/ui/animated-theme-toggler';
+import { Boxes } from '../../components/UI/background-boxes';
+import { AnimatedThemeToggler } from '../../components/UI/animated-theme-toggler';
 
 export default function Auth({ onLogin }) {
   return (
     <div className="h-screen bg-[var(--bg-color)] flex flex-col md:flex-row relative overflow-hidden font-sans selection:bg-emerald-500/30 transition-colors duration-500">
-      {/* Theme Toggle (Fixed Position) */}
       <div className="absolute top-4 right-4 z-[100]">
         <AnimatedThemeToggler variant="circle" />
       </div>
 
-      {/* Left Side - Hero Section (PC Only) */}
       <div className="hidden md:flex flex-1 relative overflow-hidden border-r border-[var(--card-border)] group bg-[var(--bg-color)] h-full">
-        {/* Background Image Container */}
         <div className="absolute inset-0 z-0">
           <img
             src="/images/auth_bg.png"
@@ -26,10 +22,9 @@ export default function Auth({ onLogin }) {
           <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-color)] via-[var(--bg-color)]/20 to-transparent opacity-75 dark:opacity-95" />
         </div>
 
-        {/* Content Overlay */}
         <div className="relative z-20 p-8 lg:p-12 flex flex-col h-full w-full justify-center">
           <div className="max-w-md">
-            {/* Logo */}
+
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -41,7 +36,6 @@ export default function Auth({ onLogin }) {
               <span className="text-xl font-black tracking-tighter text-[var(--text-primary)] uppercase">SpendSync</span>
             </motion.div>
 
-            {/* Grouped Text and Stats */}
             <div className="space-y-10">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -78,14 +72,12 @@ export default function Auth({ onLogin }) {
         </div>
       </div>
 
-      {/* Right Side - Form Section */}
       <div className="flex-1 relative bg-[var(--bg-color)] h-full overflow-hidden">
-        {/* Isolated & PINNED Grid Background Pattern */}
+
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Boxes />
         </div>
 
-        {/* Scrollable Form Content */}
         <div className="absolute inset-0 z-20 overflow-y-auto custom-scrollbar flex flex-col p-4 sm:p-8">
           <div className="w-full max-w-[420px] mx-auto my-auto py-8 relative">
             <div className="text-center mb-8 md:hidden">

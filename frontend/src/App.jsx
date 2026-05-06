@@ -1,11 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
-import Auth from './pages/Auth';
-import Dashboard from './pages/Dashboard';
-import Analytics from './pages/Analytics';
-import Settings from './pages/Settings';
-
+import Auth from './pages/auth/Auth';
+import Tracker from './pages/tracker/Tracker';
 import { Toaster } from './components/ui/sonner';
 
 const App = () => {
@@ -14,9 +11,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth onLogin={() => window.location.href = '/dashboard'} />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/dashboard/*" element={<Tracker />} />
             </Routes>
             <Toaster position="top-right" />
         </div>
