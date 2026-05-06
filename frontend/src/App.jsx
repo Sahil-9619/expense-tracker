@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 
+import { Toaster } from './components/ui/sonner';
+
 const App = () => {
     return (
         <div className="min-h-screen bg-[#030712] text-slate-100 antialiased font-sans">
@@ -16,6 +18,7 @@ const App = () => {
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/settings" element={<Settings />} />
             </Routes>
+            <Toaster position="top-right" />
         </div>
     );
 };

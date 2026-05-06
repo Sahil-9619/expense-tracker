@@ -86,8 +86,8 @@ export default function Auth({ onLogin }) {
         </div>
 
         {/* Scrollable Form Content */}
-        <div className="absolute inset-0 z-20 overflow-y-auto custom-scrollbar flex items-center justify-center p-4 sm:p-8">
-          <div className="w-full max-w-[420px] relative">
+        <div className="absolute inset-0 z-20 overflow-y-auto custom-scrollbar flex flex-col p-4 sm:p-8">
+          <div className="w-full max-w-[420px] mx-auto my-auto py-8 relative">
             <div className="text-center mb-8 md:hidden">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}

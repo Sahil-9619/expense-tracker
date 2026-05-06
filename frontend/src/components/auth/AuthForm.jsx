@@ -5,12 +5,24 @@ import { cn } from "../../lib/utils";
 import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineUser, HiOutlineEye, HiOutlineEyeSlash } from "react-icons/hi2";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "sonner";
 
 export const AuthForm = ({ onLogin }) => {
     const [searchParams] = useSearchParams();
     const [type, setType] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
     const [showPassword, setShowPassword] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    const { login, register, loading, error, setError } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const mode = searchParams.get("mode");
@@ -25,11 +37,58 @@ export const AuthForm = ({ onLogin }) => {
         if (newType !== type) {
             setType(newType);
             setTermsAccepted(false); // Reset on switch
+            setError(null);
+        }
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+    };
+
+    const resetForm = () => {
+        setFormData({
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: ""
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
+
+        if (type === "signup") {
+            if (!termsAccepted) {
+                toast.error("Please accept the terms and conditions");
+                return;
+            }
+            if (formData.password !== formData.confirmPassword) {
+                toast.error("Passwords do not match");
+                return;
+            }
+            try {
+                await register(formData.name, formData.email, formData.password);
+                toast.success("Account created successfully! Please login.");
+                setType("login");
+                resetForm();
+            } catch (err) {
+                toast.error(err.message || "Registration failed");
+            }
+        } else {
+            try {
+                await login(formData.email, formData.password);
+                toast.success("Login successful! Welcome back.");
+                resetForm();
+                navigate("/dashboard");
+            } catch (err) {
+                toast.error(err.message || "Login failed");
+            }
         }
     };
 
     return (
-        <div className="w-full max-w-[380px] mx-auto rounded-[2.5rem] p-4 sm:p-6 relative overflow-hidden backdrop-blur-none transition-colors duration-500">
+        <div className="w-full max-w-[380px] mx-auto rounded-[2.5rem] p-4 sm:p-6 relative backdrop-blur-none transition-colors duration-500">
             {/* Background effects removed for transparency */}
 
             <div className="flex flex-col items-center mb-5 sm:mb-6">
@@ -85,7 +144,9 @@ export const AuthForm = ({ onLogin }) => {
                 </button>
             </div>
 
-            <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); onLogin?.(); }}>
+            {/* Error display removed in favor of Sonner toasts */}
+
+            <form className="space-y-3" onSubmit={handleSubmit}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={type}
@@ -98,13 +159,13 @@ export const AuthForm = ({ onLogin }) => {
                         {type === "signup" && (
                             <LabelInputContainer>
                                 <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" placeholder="John Doe" type="text" icon={HiOutlineUser} />
+                                <Input id="name" placeholder="John Doe" type="text" icon={HiOutlineUser} value={formData.name} onChange={handleChange} required />
                             </LabelInputContainer>
                         )}
 
                         <LabelInputContainer>
                             <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} />
+                            <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} value={formData.email} onChange={handleChange} required />
                         </LabelInputContainer>
 
                         <LabelInputContainer>
@@ -115,6 +176,9 @@ export const AuthForm = ({ onLogin }) => {
                                     placeholder="••••••••"
                                     type={showPassword ? "text" : "password"}
                                     icon={HiOutlineLockClosed}
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
                                 />
                                 <button
                                     type="button"
@@ -128,8 +192,8 @@ export const AuthForm = ({ onLogin }) => {
 
                         {type === "signup" && (
                             <LabelInputContainer>
-                                <Label htmlFor="confirm-password">Confirm Password</Label>
-                                <Input id="confirm-password" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} />
+                                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={formData.confirmPassword} onChange={handleChange} required />
                             </LabelInputContainer>
                         )}
 
@@ -164,10 +228,11 @@ export const AuthForm = ({ onLogin }) => {
                 </AnimatePresence>
 
                 <button
-                    className="bg-emerald-600 relative group/btn block w-[92%] mx-auto text-white rounded-full h-10 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-emerald-900/20 transition-all hover:bg-emerald-500 active:scale-[0.98] mt-5"
+                    className="bg-emerald-600 relative group/btn block w-[92%] mx-auto text-white rounded-full h-10 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-emerald-900/20 transition-all hover:bg-emerald-500 active:scale-[0.98] mt-5 disabled:opacity-50 disabled:cursor-not-allowed"
                     type="submit"
+                    disabled={loading}
                 >
-                    {type === "login" ? "Login" : "Create Account"}
+                    {loading ? "Processing..." : (type === "login" ? "Login" : "Create Account")}
                     <BottomGradient />
                 </button>
 
