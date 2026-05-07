@@ -1,59 +1,75 @@
-import React from 'react';
-import { 
-  Search, 
-  Bell, 
-  Sun, 
-  Moon, 
-  Command 
-} from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { motion } from 'motion/react';
+import { HiMenu } from 'react-icons/hi';
+import { cn } from '../lib/utils';
+import { menuItems } from './Sidebar';
+import { AnimatedThemeToggler } from './UI/animated-theme-toggler';
+import { fetchUserProfile } from '../redux/slices/authSlice';
 
-export default function Header() {
-  const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth();
-  const isDark = theme === 'dark';
+export default function Header({ isSidebarOpen, onToggleSidebar }) {
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const { user, loading } = useSelector((state) => state.auth);
+  const pathname = location.pathname;
+
+  useEffect(() => {
+    // Fetch latest user details from backend on mount
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+
+  // Find the current active menu item by matching the path with the current pathname
+  const currentItem = menuItems.find(item => item.path === pathname);
+  const currentTitle = currentItem?.label || 'Dashboard';
 
   return (
-    <header className="h-12 border-b border-[var(--card-border)] flex items-center justify-between px-4 shrink-0 bg-[var(--bg-color)]/80 backdrop-blur-md sticky top-0 z-40">
-      <div className="flex items-center gap-2 w-64">
-        <div className="flex items-center gap-2 px-2 py-1 rounded-md text-xs w-full bg-[var(--input-bg)] border border-[var(--card-border)] text-[var(--text-secondary)]">
-          <Search size={12} />
-          <input 
-            type="text" 
-            placeholder="Search transactions..." 
-            className="bg-transparent border-none outline-none w-full placeholder-inherit text-[var(--text-primary)]"
-          />
-          <div className="flex items-center gap-0.5 opacity-50 font-mono">
-            <Command size={10} /> <span>K</span>
-          </div>
+    <header className="bg-[var(--bg-color)] border-b border-[var(--card-border)] px-6 py-2.5 flex items-center justify-between sticky top-0 transition-all duration-300">
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onToggleSidebar}
+          className={cn(
+            "p-2 hover:bg-emerald-500/10 rounded-xl text-emerald-500 transition-all duration-300 md:hidden flex"
+          )}
+        >
+          <HiMenu size={24} />
+        </button>
+        <div>
+          <h1 className="font-serif text-xl text-[var(--text-primary)] leading-tight">{currentTitle}</h1>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-secondary)] mt-0.5 font-bold">
+            {loading ? 'Updating profile...' : `Welcome back, ${user?.name || 'Authorized User'}`}
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button 
-          onClick={toggleTheme} 
-          className="p-1.5 rounded-md hover:bg-[var(--card-border)] transition-colors text-[var(--text-secondary)]"
-        >
-          {isDark ? <Sun size={14} /> : <Moon size={14} />}
-        </button>
-        <button className="p-1.5 rounded-md hover:bg-[var(--card-border)] transition-colors relative text-[var(--text-secondary)]">
-          <Bell size={14} />
-          <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-        </button>
-        
-        <div className="h-4 w-px bg-[var(--card-border)] mx-1"></div>
-        
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="text-right hidden sm:block">
-            <p className="text-[11px] font-black leading-none text-[var(--text-primary)] uppercase tracking-tighter">
-              {user?.name || 'Authorized User'}
-            </p>
-            <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Pro Plan</p>
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          <AnimatedThemeToggler
+            variant="circle"
+            duration={500}
+            className="p-1.5 border-none bg-transparent hover:bg-emerald-500/5"
+          />
+        </div>
+
+        <div className="flex items-center gap-4 border-l border-[var(--card-border)] pl-6">
+          <div className="hidden sm:flex flex-col items-end mr-2">
+            <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-tight">
+              {user?.name || 'User'}
+            </span>
+            <span className="text-[10px] text-emerald-500 font-black  tracking-widest opacity-80">
+              {user?.email || 'email'}
+            </span>
           </div>
-          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600 border border-[var(--card-border)] flex items-center justify-center text-[10px] font-black text-white">
-            {user?.name?.[0]?.toUpperCase() || 'U'}
-          </div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 to-emerald-600 border border-white/10 shadow-lg flex items-center justify-center text-white font-black cursor-pointer overflow-hidden"
+          >
+            {user?.profile_pic ? (
+              <img src={user.profile_pic} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              user?.name?.[0]?.toUpperCase() || 'U'
+            )}
+          </motion.div>
         </div>
       </div>
     </header>

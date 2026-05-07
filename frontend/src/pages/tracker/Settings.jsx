@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
-import {
-  User, Shield, Bell, CreditCard,
-  Globe, Zap, ChevronRight, Camera, Terminal
+import { useDispatch, useSelector } from 'react-redux';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  User, Shield, Bell, CreditCard, 
+  Globe, Zap, Camera, Terminal,
+  ShieldCheck, Smartphone, Key
 } from 'lucide-react';
+import { toast } from "sonner";
+import { setUser as setReduxUser } from '../../redux/slices/authSlice';
 
-export default function Settings({ user, setUser, showToast }) {
+export default function Settings() {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -12,101 +23,131 @@ export default function Settings({ user, setUser, showToast }) {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    setUser({ ...user, ...formData });
-    showToast("System Identity Updated", "success");
+    dispatch(setReduxUser({ ...user, ...formData }));
+    toast.success("System Identity Updated Successfully");
   };
 
   return (
-    <div className="max-w-5xl space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-
+    <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div>
-        <h3 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.5em] mb-2">Module: System Interface</h3>
-        <h4 className="text-4xl font-black text-white tracking-tighter">Global Preferences</h4>
+        <h1 className="text-xl font-black tracking-tight text-[var(--text-primary)] uppercase">System Configuration</h1>
+        <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Manage your node preferences and security</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-3 space-y-3">
-          <SettingsNav icon={User} label="Identity" active />
-          <SettingsNav icon={Shield} label="Security" />
-          <SettingsNav icon={Bell} label="Protocol" />
-          <SettingsNav icon={CreditCard} label="Ledger" />
-          <SettingsNav icon={Globe} label="Region" />
-          <SettingsNav icon={Terminal} label="API Core" />
-        </div>
+      <Tabs defaultValue="identity" className="w-full flex flex-col md:flex-row gap-8">
+        <TabsList className="flex flex-col h-auto bg-transparent border-none p-0 gap-2 min-w-[200px]">
+          <SettingsTab value="identity" icon={User} label="Identity" />
+          <SettingsTab value="security" icon={Shield} label="Security" />
+          <SettingsTab value="notifications" icon={Bell} label="Notifications" />
+          <SettingsTab value="billing" icon={CreditCard} label="Billing" />
+          <SettingsTab value="api" icon={Terminal} label="API Access" />
+        </TabsList>
 
-        <div className="lg:col-span-9 space-y-8">
-          <div className="bento-card p-12 bg-slate-950/40 border-white/5 space-y-12 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-12 opacity-5">
-              <Zap className="w-32 h-32 text-indigo-500" />
-            </div>
-
-            <div className="flex items-center gap-10 relative z-10">
-              <div className="relative group">
-                <div className="w-28 h-28 rounded-[2.5rem] bg-slate-900 overflow-hidden border-4 border-white/5 shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)] transition-transform duration-500 group-hover:scale-105">
-                  <img src={user?.avatar} alt="Identity" className="w-full h-full object-cover" />
+        <div className="flex-1">
+          <TabsContent value="identity" className="mt-0 space-y-6">
+            <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6">
+                  <div className="relative group">
+                    <div className="w-20 h-20 rounded-xl bg-[var(--bg-color)] overflow-hidden border border-[var(--card-border)] shadow-lg group-hover:scale-105 transition-transform duration-500">
+                      {user?.profile_pic ? (
+                        <img src={user.profile_pic} alt="Identity" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl font-black text-emerald-500">
+                          {user?.name?.[0]?.toUpperCase() || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <button className="absolute -bottom-1 -right-1 p-2 bg-emerald-600 text-white rounded-lg shadow-xl hover:scale-110 active:scale-95 transition-all">
+                      <Camera size={14} />
+                    </button>
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight">Authorized Identity</CardTitle>
+                    <CardDescription className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1">Status: Active Protocol</CardDescription>
+                  </div>
                 </div>
-                <button className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all border border-white/10">
-                  <Camera className="w-4 h-4" />
-                </button>
-              </div>
+              </CardHeader>
+              <CardContent className="p-8 pt-6">
+                <form onSubmit={handleUpdate} className="space-y-6 max-w-md">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Full Name</Label>
+                      <Input 
+                        value={formData.name} 
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-md text-xs font-bold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Email Address</Label>
+                      <Input 
+                        type="email"
+                        value={formData.email} 
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-md text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-md shadow-lg shadow-emerald-500/10">
+                    Sync Changes <Zap size={14} className="ml-2" />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-rose-500/5 border border-rose-500/10 rounded-sm p-6 flex flex-col md:flex-row items-center justify-between gap-6 group">
               <div>
-                <h5 className="text-2xl font-black text-white tracking-tighter uppercase">Authorized Identity</h5>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-2">Initialized Epoch: May 2026</p>
+                <h5 className="text-sm font-black text-rose-400 uppercase tracking-tight group-hover:text-rose-300 transition-colors">Terminate Account</h5>
+                <p className="text-[10px] font-bold text-rose-500/60 uppercase tracking-widest mt-1">Permanently purge all protocol data from our servers</p>
               </div>
-            </div>
+              <Button variant="outline" className="h-10 border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white rounded-md text-[9px] font-black uppercase tracking-widest">
+                Execute Purge
+              </Button>
+            </Card>
+          </TabsContent>
 
-            <form onSubmit={handleUpdate} className="space-y-8 relative z-10 max-w-xl">
+          <TabsContent value="security" className="mt-0">
+            <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-8">
+              <h2 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-tight mb-8">Security Protocols</h2>
               <div className="space-y-6">
-                <SettingsInput label="Protocol Identity" value={formData.name} onChange={(v) => setFormData({ ...formData, name: v })} />
-                <SettingsInput label="Communication Node" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} />
+                <SecurityItem icon={ShieldCheck} title="Two-Factor Authentication" desc="Add an extra layer of security to your account" active={true} />
+                <SecurityItem icon={Smartphone} title="Mobile Sessions" desc="Manage devices currently logged into your node" />
+                <SecurityItem icon={Key} title="Change Password" desc="Last updated: 3 months ago" />
               </div>
-
-              <button
-                type="submit"
-                className="px-12 py-5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] group"
-              >
-                Sync Changes <Zap className="w-4 h-4 inline ml-2 group-hover:animate-pulse" />
-              </button>
-            </form>
-          </div>
-
-          <div className="bento-card p-10 bg-rose-500/5 border-rose-500/10 flex flex-col md:flex-row items-center justify-between gap-6 group">
-            <div>
-              <h5 className="text-sm font-black text-rose-400 uppercase tracking-tight group-hover:text-rose-300 transition-colors">Terminus Operation</h5>
-              <p className="text-[10px] font-bold text-rose-500/60 uppercase tracking-widest mt-1">Permanently purge all protocol data</p>
-            </div>
-            <button className="px-8 py-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-xl shadow-rose-900/5 active:scale-95">
-              Execute Purge
-            </button>
-          </div>
+            </Card>
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
     </div>
   );
 }
 
-function SettingsNav({ icon: Icon, label, active = false }) {
+function SettingsTab({ value, icon: Icon, label }) {
   return (
-    <button className={`w-full flex items-center justify-between px-6 py-5 rounded-[1.5rem] transition-all duration-500 group ${active ? 'bg-white/10 border border-white/10 shadow-[0_0_30px_-5px_rgba(99,102,241,0.3)] text-white' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300 border border-transparent hover:border-white/5'}`}>
-      <div className="flex items-center gap-4">
-        <Icon className={`w-4 h-4 transition-colors ${active ? 'text-indigo-400' : 'text-slate-600 group-hover:text-slate-400'}`} />
-        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{label}</span>
-      </div>
-      <ChevronRight className={`w-4 h-4 transition-all ${active ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`} />
-    </button>
+    <TabsTrigger 
+      value={value} 
+      className="w-full justify-start gap-3 px-4 py-3 rounded-md text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:border-emerald-500/20 border border-transparent transition-all"
+    >
+      <Icon size={16} strokeWidth={2.5} />
+      {label}
+    </TabsTrigger>
   );
 }
 
-function SettingsInput({ label, value, onChange, type = "text" }) {
+function SecurityItem({ icon: Icon, title, desc, active = false }) {
   return (
-    <div className="space-y-3">
-      <label className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-8 py-5 text-sm font-bold text-white focus:bg-white/[0.05] focus:border-indigo-500/50 focus:ring-8 focus:ring-indigo-500/5 transition-all outline-none"
-      />
+    <div className="flex items-center justify-between p-4 rounded-md bg-[var(--bg-color)]/40 border border-[var(--card-border)] group hover:border-emerald-500/30 transition-all">
+      <div className="flex items-center gap-4">
+        <div className={`p-2 rounded-lg ${active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-500/10 text-[var(--text-secondary)]'}`}>
+          <Icon size={18} />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)]">{title}</span>
+          <span className="text-[9px] text-[var(--text-secondary)] font-medium">{desc}</span>
+        </div>
+      </div>
+      <Button variant="ghost" className="text-[9px] font-black uppercase tracking-widest text-emerald-500 hover:bg-emerald-500/5">Configure</Button>
     </div>
   );
 }

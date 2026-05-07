@@ -5,8 +5,16 @@ import Header from '../../components/Header';
 import Dashboard from './Dashboard';
 import Analytics from './Analytics';
 import Settings from './Settings';
-import { getExpenses } from '../../services/expense.service';
+import Wallets from './Wallets';
+import Transactions from './Transactions';
+import Budgets from './Budgets';
+import Goals from './Goals';
+import Reports from './Reports';
+import Help from './Help';
+import TransactionDialog from '../../components/tracker/TransactionDialog';
+import { getExpenses, createExpense } from '../../services/expense.service';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'sonner';
 import { 
   ShoppingBag, Utensils, Car, Heart, 
   Gamepad2, Lightbulb, User, MoreHorizontal 
@@ -25,8 +33,22 @@ const categoryConfig = {
 
 export default function Tracker() {
   const [transactions, setTransactions] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchTransactions = useCallback(async () => {
     try {
@@ -41,25 +63,50 @@ export default function Tracker() {
     fetchTransactions();
   }, [fetchTransactions]);
 
+  const handleAddTransaction = async (txData) => {
+    try {
+      await createExpense(txData);
+      toast.success('Transaction Synchronized Successfully');
+      fetchTransactions();
+    } catch (err) {
+      toast.error('Protocol Synchronization Failed');
+      console.error(err);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/auth');
   };
 
   return (
-    <div className="flex h-screen bg-[var(--bg-color)] overflow-hidden transition-colors duration-500">
-      <Sidebar onLogout={handleLogout} />
+    <div className="flex h-screen bg-[var(--bg-color)] overflow-hidden transition-colors duration-500 relative">
+      <Sidebar 
+        onLogout={handleLogout} 
+        isOpen={isSidebarOpen} 
+        setIsOpen={setIsSidebarOpen} 
+      />
       
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header />
+        <Header 
+          isSidebarOpen={isSidebarOpen} 
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+        />
         
-        <main className="flex-1 relative overflow-y-auto custom-scrollbar">
+        <main className="flex-1 relative overflow-y-auto no-scrollbar">
           <Routes>
             <Route index element={
               <Dashboard 
                 transactions={transactions} 
                 categoryConfig={categoryConfig}
-                onAddClick={() => navigate('/dashboard')} 
+                onAddClick={() => setIsTxModalOpen(true)} 
+              />
+            } />
+            <Route path="wallets" element={<Wallets />} />
+            <Route path="transactions" element={
+              <Transactions 
+                transactions={transactions} 
+                onAddClick={() => setIsTxModalOpen(true)}
               />
             } />
             <Route path="analytics" element={
@@ -68,12 +115,24 @@ export default function Tracker() {
                 categoryConfig={categoryConfig} 
               />
             } />
+            <Route path="reports" element={<Reports />} />
+            <Route path="budgets" element={<Budgets />} />
+            <Route path="goals" element={<Goals />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="help" element={<Help />} />
+            
             {/* Fallback routes */}
-            <Route path="*" element={<Dashboard transactions={transactions} categoryConfig={categoryConfig} />} />
+            <Route path="*" element={<Dashboard transactions={transactions} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
           </Routes>
         </main>
       </div>
+
+      <TransactionDialog 
+        isOpen={isTxModalOpen} 
+        onOpenChange={setIsTxModalOpen}
+        onAdd={handleAddTransaction}
+        categoryConfig={categoryConfig}
+      />
     </div>
   );
 }

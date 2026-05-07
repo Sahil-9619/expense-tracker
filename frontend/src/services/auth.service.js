@@ -14,6 +14,12 @@ export const registerUser = async (userData) => {
     });
 };
 
+export const getUserProfile = async () => {
+    return apiService('/auth/user/', {
+        method: 'GET',
+    });
+};
+
 export const logoutUser = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

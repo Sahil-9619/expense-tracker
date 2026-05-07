@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { loginUser, registerUser } from '../services/auth.service';
+import { setUser as setReduxUser, logout as logoutRedux } from '../redux/slices/authSlice';
 
 const AuthContext = createContext();
 
@@ -7,16 +9,19 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // Check for stored token on mount
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('access_token');
         if (storedUser && token) {
-            setUser(JSON.parse(storedUser));
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            dispatch(setReduxUser(parsedUser));
         }
         setLoading(false);
-    }, []);
+    }, [dispatch]);
 
     const login = async (email, password) => {
         setLoading(true);
@@ -26,7 +31,10 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             localStorage.setItem('user', JSON.stringify(data.user));
+            
             setUser(data.user);
+            dispatch(setReduxUser(data.user)); // Update Redux
+            
             return data;
         } catch (err) {
             setError(err.message);
@@ -55,6 +63,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         setUser(null);
+        dispatch(logoutRedux()); // Update Redux
     };
 
     return (
