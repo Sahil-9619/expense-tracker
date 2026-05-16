@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
+import {
   LayoutDashboard, 
   Wallet, 
   ArrowRightLeft, 
@@ -18,6 +18,14 @@ import {
   UserCircle
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { BRAND_NAME } from '../lib/constants';
+
+const BRAND_INITIALS = BRAND_NAME
+  .split(' ')
+  .map((word) => word[0])
+  .join('')
+  .slice(0, 2)
+  .toUpperCase();
 
 export const menuItems = [
   // Overview
@@ -91,11 +99,11 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
         <div className={`flex items-center px-4 mb-8 ${isOpen ? 'justify-between' : 'justify-center'}`}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-sm bg-gradient-to-tr from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-emerald-500/20 shrink-0">
-              SS
+              {BRAND_INITIALS}
             </div>
             {isOpen && (
               <span className="font-black text-sm tracking-tight text-[var(--text-primary)] uppercase">
-                SpendSync
+                {BRAND_NAME}
               </span>
             )}
           </div>

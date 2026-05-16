@@ -1,1 +1,1 @@
-export const BRAND_NAME = "SpendSync";
+export const BRAND_NAME = "Exp Pro";

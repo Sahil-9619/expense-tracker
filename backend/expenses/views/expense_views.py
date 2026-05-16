@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -38,12 +39,8 @@ expense_request_body = openapi.Schema(
     responses={201: ExpenseSerializer}
 )
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def expense_list(request):
-
-    
-    if not hasattr(request, "user"):
-        return Response({"error": "Unauthorized"}, status=401)
-
     user = request.user
 
     # GET (only user’s expenses)
@@ -98,11 +95,8 @@ expense_id_param = openapi.Parameter(
 )
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def expense_detail(request, id):
-
-    if not hasattr(request, "user"):
-        return Response({"error": "Unauthorized"}, status=401)
-
     user = request.user
     expense = get_expense_by_id(id)
 

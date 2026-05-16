@@ -13,7 +13,11 @@ class JWTAuthMiddleware:
         #Public routes
         public_paths = [
             '/api/auth/signup/',
+            '/api/auth/signup/verify-otp/',
             '/api/auth/login/',
+            '/api/auth/forgot-password/',
+            '/api/auth/reset-password/',
+            '/api/auth/token/refresh/',
         ]
 
         # Normalize path (remove trailing slash issues)

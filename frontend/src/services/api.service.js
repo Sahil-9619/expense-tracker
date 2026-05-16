@@ -1,4 +1,32 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
+const NETWORK_ERROR_MESSAGE = 'Network error';
+
+const parseResponse = async (response) => {
+    const text = await response.text();
+
+    if (!text) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return { detail: text };
+    }
+};
+
+const isNetworkError = (error) => {
+    return error instanceof TypeError && error.message === 'Failed to fetch';
+};
+
+const isAuthError = (response, data) => {
+    return response.status === 401 && (
+        data?.code === 'token_not_valid'
+        || data?.code === 'not_authenticated'
+        || data?.detail === 'Authentication credentials were not provided.'
+        || data?.detail === 'Given token not valid for any token type'
+    );
+};
 
 const apiService = async (endpoint, options = {}) => {
     const url = `${BASE_URL}${endpoint}`;
@@ -8,8 +36,8 @@ const apiService = async (endpoint, options = {}) => {
     };
 
     const token = localStorage.getItem('access_token');
-    const isPublicEndpoint = endpoint.includes('/auth/signup/') || endpoint.includes('/auth/login/') || endpoint.includes('/auth/token/refresh/');
-    
+    const isPublicEndpoint = endpoint.startsWith('/auth/') && !endpoint.includes('/auth/user/');
+
     if (token && !isPublicEndpoint) {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
@@ -24,12 +52,12 @@ const apiService = async (endpoint, options = {}) => {
 
     try {
         let response = await fetch(url, config);
-        let data = await response.json();
+        let data = await parseResponse(response);
 
         // 🔄 Handle Token Expiration
-        if (response.status === 401 && data.code === 'token_not_valid' && !isPublicEndpoint) {
+        if (isAuthError(response, data) && !isPublicEndpoint) {
             const refreshToken = localStorage.getItem('refresh_token');
-            
+
             if (refreshToken) {
                 try {
                     const refreshRes = await fetch(`${BASE_URL}/auth/token/refresh/`, {
@@ -39,18 +67,18 @@ const apiService = async (endpoint, options = {}) => {
                     });
 
                     if (refreshRes.ok) {
-                        const refreshData = await refreshRes.json();
+                        const refreshData = await parseResponse(refreshRes);
                         localStorage.setItem('access_token', refreshData.access);
-                        
+
                         // Retry the original request with the new token
                         config.headers['Authorization'] = `Bearer ${refreshData.access}`;
                         response = await fetch(url, config);
-                        data = await response.json();
+                        data = await parseResponse(response);
                     } else {
                         // Refresh token also invalid/expired
                         handleLogout();
                     }
-                } catch (refreshErr) {
+                } catch {
                     handleLogout();
                 }
             } else {
@@ -59,13 +87,16 @@ const apiService = async (endpoint, options = {}) => {
         }
 
         if (!response.ok) {
-            const errorMsg = data.error || data.detail || (data.email ? data.email[0] : null) || (data.password ? data.password[0] : null) || 'Something went wrong';
+            const errorMsg = data?.error || data?.detail || (data?.email ? data.email[0] : null) || (data?.password ? data.password[0] : null) || 'Something went wrong';
             throw new Error(errorMsg);
         }
 
         return data;
     } catch (error) {
-        console.error('API Error:', error);
+        if (isNetworkError(error)) {
+            throw new Error(NETWORK_ERROR_MESSAGE);
+        }
+
         throw error;
     }
 };

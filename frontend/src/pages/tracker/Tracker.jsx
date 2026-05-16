@@ -54,8 +54,8 @@ export default function Tracker() {
     try {
       const data = await getExpenses();
       setTransactions(data);
-    } catch (err) {
-      console.error('Failed to fetch transactions:', err);
+    } catch {
+      toast.error('Unable to load transactions');
     }
   }, []);
 
@@ -69,8 +69,7 @@ export default function Tracker() {
       toast.success('Transaction Synchronized Successfully');
       fetchTransactions();
     } catch (err) {
-      toast.error('Protocol Synchronization Failed');
-      console.error(err);
+      toast.error(err.message || 'Protocol Synchronization Failed');
     }
   };
 

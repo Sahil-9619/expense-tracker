@@ -96,7 +96,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-emerald-500/60 rounded-full hover:bg-emerald-500 transition-colors border-[1px] border-transparent bg-clip-padding shadow-[inset_0_0_10px_rgba(0, 0, 0, 0.2)];
+    @apply bg-emerald-500/60 rounded-full hover:bg-emerald-500 transition-colors border-[1px] border-transparent bg-clip-padding shadow-[inset_0_0_10px_rgba(0,0,0,0.2)];
   }
 
   /* For Firefox */

@@ -1,6 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { loginUser, registerUser } from '../services/auth.service';
+import {
+    loginUser,
+    registerUser,
+    requestPasswordReset,
+    resetPassword,
+    verifySignupOtp,
+} from '../services/auth.service';
 import { setUser as setReduxUser, logout as logoutRedux } from '../redux/slices/authSlice';
 
 const AuthContext = createContext();
@@ -58,6 +64,45 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const verifySignup = async (email, otp) => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await verifySignupOtp({ email, otp });
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const sendPasswordResetOtp = async (email) => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await requestPasswordReset({ email });
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const confirmPasswordReset = async (email, otp, password) => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await resetPassword({ email, otp, password });
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
@@ -67,7 +112,18 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, register, logout, setError }}>
+        <AuthContext.Provider value={{
+            user,
+            loading,
+            error,
+            login,
+            register,
+            verifySignup,
+            sendPasswordResetOtp,
+            confirmPasswordReset,
+            logout,
+            setError,
+        }}>
             {children}
         </AuthContext.Provider>
     );

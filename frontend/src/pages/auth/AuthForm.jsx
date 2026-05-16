@@ -28,8 +28,21 @@ export const AuthForm = ({ onLogin }) => {
         confirmPassword: ""
     });
 
-    const { login, register, loading, setError } = useAuth();
+    const [signupOtp, setSignupOtp] = useState("");
+    const [resetData, setResetData] = useState({
+        email: "",
+        otp: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    const { login, register, verifySignup, sendPasswordResetOtp, confirmPasswordReset, loading, setError } = useAuth();
     const navigate = useNavigate();
+    const isLogin = type === "login";
+    const isSignup = type === "signup";
+    const isSignupOtp = type === "signupOtp";
+    const isForgot = type === "forgot";
+    const isResetPassword = type === "resetPassword";
 
     useEffect(() => {
         const mode = searchParams.get("mode");
@@ -46,6 +59,7 @@ export const AuthForm = ({ onLogin }) => {
             setTermsAccepted(false);
             setError(null);
             setShowPassword(false);
+            setSignupOtp("");
         }
     };
 
@@ -57,6 +71,10 @@ export const AuthForm = ({ onLogin }) => {
         setSignupData({ ...signupData, [e.target.id]: e.target.value });
     };
 
+    const handleResetChange = (e) => {
+        setResetData({ ...resetData, [e.target.id]: e.target.value });
+    };
+
     const resetSignupForm = () => {
         setSignupData({
             name: "",
@@ -65,6 +83,7 @@ export const AuthForm = ({ onLogin }) => {
             confirmPassword: ""
         });
         setTermsAccepted(false);
+        setSignupOtp("");
     };
 
     const resetLoginForm = () => {
@@ -74,11 +93,32 @@ export const AuthForm = ({ onLogin }) => {
         });
     };
 
+    const startForgotPassword = () => {
+        setError(null);
+        setShowPassword(false);
+        setResetData({
+            email: loginData.email,
+            otp: "",
+            password: "",
+            confirmPassword: ""
+        });
+        setType("forgot");
+    };
+
+    const getSubmitLabel = () => {
+        if (loading) return "Processing...";
+        if (isSignup) return "Send OTP";
+        if (isSignupOtp) return "Verify Account";
+        if (isForgot) return "Send Reset OTP";
+        if (isResetPassword) return "Reset Password";
+        return "Login";
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
 
-        if (type === "signup") {
+        if (isSignup) {
             if (!termsAccepted) {
                 toast.error("Please accept the terms and conditions");
                 return;
@@ -89,15 +129,41 @@ export const AuthForm = ({ onLogin }) => {
             }
             try {
                 await register(signupData.name, signupData.email, signupData.password);
-                toast.success("Account created successfully! Please login with your credentials.");
-                
-                // CLEAR Signup Form
-                resetSignupForm();
-                
-                // SWITCH to Login Mode
-                setType("login");
+                toast.success("OTP sent to your email. Verify your account to continue.");
+                setType("signupOtp");
             } catch (err) {
                 toast.error(err.message || "Registration failed");
+            }
+        } else if (isSignupOtp) {
+            try {
+                await verifySignup(signupData.email, signupOtp);
+                toast.success("Email verified successfully. Please login.");
+                resetSignupForm();
+                setType("login");
+            } catch (err) {
+                toast.error(err.message || "OTP verification failed");
+            }
+        } else if (isForgot) {
+            try {
+                await sendPasswordResetOtp(resetData.email);
+                toast.success("Password reset OTP sent to your email.");
+                setType("resetPassword");
+            } catch (err) {
+                toast.error(err.message || "Could not send reset OTP");
+            }
+        } else if (isResetPassword) {
+            if (resetData.password !== resetData.confirmPassword) {
+                toast.error("Passwords do not match");
+                return;
+            }
+            try {
+                await confirmPasswordReset(resetData.email, resetData.otp, resetData.password);
+                toast.success("Password reset successful. Please login.");
+                setLoginData({ email: resetData.email, password: "" });
+                setResetData({ email: "", otp: "", password: "", confirmPassword: "" });
+                setType("login");
+            } catch (err) {
+                toast.error(err.message || "Password reset failed");
             }
         } else {
             try {
@@ -127,7 +193,7 @@ export const AuthForm = ({ onLogin }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="font-black text-lg sm:text-xl text-[var(--text-primary)] tracking-tight uppercase"
                 >
-                    {type === "login" ? "Welcome Back" : "Create account"}
+                    {isSignupOtp ? "Verify Email" : isForgot ? "Recover Access" : isResetPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create account"}
                 </motion.h2>
                 <motion.p
                     key={type + "-desc"}
@@ -136,36 +202,44 @@ export const AuthForm = ({ onLogin }) => {
                     transition={{ delay: 0.1 }}
                     className="text-[var(--text-secondary)] text-[10px] uppercase tracking-widest mt-1.5 max-w-sm text-center font-bold opacity-90"
                 >
-                    {type === "login"
-                        ? "Secure session access"
-                        : "Create and manage expenses freely and effectively"}
+                    {isSignupOtp
+                        ? `Enter the OTP sent to ${signupData.email}`
+                        : isForgot
+                            ? "Send a reset code to your email"
+                            : isResetPassword
+                                ? "Enter OTP and choose a new password"
+                                : isLogin
+                                    ? "Secure session access"
+                                    : "Create and manage expenses freely and effectively"}
                 </motion.p>
             </div>
 
-            <div className="relative flex w-full h-10 bg-[var(--card-bg)] rounded-full p-1 mb-5 sm:mb-6 border border-[var(--card-border)]">
+            <div className={cn("relative flex w-full h-10 bg-[var(--card-bg)] rounded-full p-1 mb-5 sm:mb-6 border border-[var(--card-border)]", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
                 <motion.div
                     className="absolute inset-y-1 bg-emerald-600 rounded-full shadow-lg shadow-emerald-600/20"
                     initial={false}
                     animate={{
-                        x: type === "login" ? 0 : "100%",
+                        x: isLogin ? 0 : "100%",
                         width: "50%",
                     }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
                 <button
+                    type="button"
                     onClick={() => toggleType("login")}
                     className={cn(
                         "relative z-10 flex-1 h-full text-[10px] font-black uppercase tracking-widest transition-colors duration-200",
-                        type === "login" ? "text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                        isLogin ? "text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                 >
                     Login
                 </button>
                 <button
+                    type="button"
                     onClick={() => toggleType("signup")}
                     className={cn(
                         "relative z-10 flex-1 h-full text-[10px] font-black uppercase tracking-widest transition-colors duration-200",
-                        type === "signup" ? "text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                        isSignup ? "text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                 >
                     Signup
@@ -182,7 +256,7 @@ export const AuthForm = ({ onLogin }) => {
                         transition={{ duration: 0.2 }}
                         className="space-y-3"
                     >
-                        {type === "signup" ? (
+                        {isSignup ? (
                             <>
                                 <LabelInputContainer>
                                     <Label htmlFor="name">Full Name</Label>
@@ -221,6 +295,92 @@ export const AuthForm = ({ onLogin }) => {
                                     <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={signupData.confirmPassword} onChange={handleSignupChange} required />
                                 </LabelInputContainer>
                             </>
+                        ) : isSignupOtp ? (
+                            <>
+                                <LabelInputContainer>
+                                    <Label htmlFor="signupOtp">Verification OTP</Label>
+                                    <Input id="signupOtp" placeholder="Enter 6 digit OTP" type="text" inputMode="numeric" maxLength={6} icon={HiOutlineEnvelope} value={signupOtp} onChange={(e) => setSignupOtp(e.target.value)} required />
+                                </LabelInputContainer>
+
+                                <div className="w-full flex items-center justify-between px-3">
+                                    <button type="button" onClick={() => setType("signup")} className="text-[10px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                                        Edit Details
+                                    </button>
+                                    <button type="button" onClick={async () => {
+                                        try {
+                                            await register(signupData.name, signupData.email, signupData.password);
+                                            toast.success("New OTP sent to your email.");
+                                        } catch (err) {
+                                            toast.error(err.message || "Could not resend OTP");
+                                        }
+                                    }} className="text-[10px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
+                                        Resend OTP
+                                    </button>
+                                </div>
+                            </>
+                        ) : isForgot ? (
+                            <>
+                                <LabelInputContainer>
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input id="email" placeholder="name@example.com" type="email" icon={HiOutlineEnvelope} value={resetData.email} onChange={handleResetChange} required />
+                                </LabelInputContainer>
+
+                                <div className="w-full flex justify-end px-3">
+                                    <button type="button" onClick={() => setType("login")} className="text-[10px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                                        Back to Login
+                                    </button>
+                                </div>
+                            </>
+                        ) : isResetPassword ? (
+                            <>
+                                <LabelInputContainer>
+                                    <Label htmlFor="otp">Reset OTP</Label>
+                                    <Input id="otp" placeholder="Enter 6 digit OTP" type="text" inputMode="numeric" maxLength={6} icon={HiOutlineEnvelope} value={resetData.otp} onChange={handleResetChange} required />
+                                </LabelInputContainer>
+
+                                <LabelInputContainer>
+                                    <Label htmlFor="password">New Password</Label>
+                                    <div className="relative group">
+                                        <Input
+                                            id="password"
+                                            placeholder="••••••••"
+                                            type={showPassword ? "text" : "password"}
+                                            icon={HiOutlineLockClosed}
+                                            value={resetData.password}
+                                            onChange={handleResetChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
+                                        >
+                                            {showPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </LabelInputContainer>
+
+                                <LabelInputContainer>
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={resetData.confirmPassword} onChange={handleResetChange} required />
+                                </LabelInputContainer>
+
+                                <div className="w-full flex items-center justify-between px-3">
+                                    <button type="button" onClick={() => setType("forgot")} className="text-[10px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                                        Change Email
+                                    </button>
+                                    <button type="button" onClick={async () => {
+                                        try {
+                                            await sendPasswordResetOtp(resetData.email);
+                                            toast.success("New reset OTP sent to your email.");
+                                        } catch (err) {
+                                            toast.error(err.message || "Could not resend reset OTP");
+                                        }
+                                    }} className="text-[10px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
+                                        Resend OTP
+                                    </button>
+                                </div>
+                            </>
                         ) : (
                             <>
                                 <LabelInputContainer>
@@ -253,7 +413,7 @@ export const AuthForm = ({ onLogin }) => {
                         )}
 
                         <div className="flex items-center justify-between px-1">
-                            {type === "signup" ? (
+                            {isSignup ? (
                                 <div
                                     className="flex items-center gap-2 group/check cursor-pointer"
                                     onClick={() => setTermsAccepted(!termsAccepted)}
@@ -271,12 +431,14 @@ export const AuthForm = ({ onLogin }) => {
                                         I agree to <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>terms</a> and <a href="#" className="text-emerald-500 hover:underline" onClick={(e) => e.stopPropagation()}>conditions</a>
                                     </span>
                                 </div>
-                            ) : (
+                            ) : isLogin ? (
                                 <div className="w-full flex justify-end">
-                                    <button type="button" className="text-[10px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
+                                    <button type="button" onClick={startForgotPassword} className="text-[10px] uppercase tracking-[0.2em] font-black text-emerald-500/80 hover:text-emerald-500 transition-colors">
                                         Forgot Password?
                                     </button>
                                 </div>
+                            ) : (
+                                <div className="h-1" />
                             )}
                         </div>
                     </motion.div>
@@ -287,17 +449,17 @@ export const AuthForm = ({ onLogin }) => {
                     type="submit"
                     disabled={loading}
                 >
-                    {loading ? "Processing..." : (type === "login" ? "Login" : "Create Account")}
+                    {getSubmitLabel()}
                     <BottomGradient />
                 </button>
 
-                <div className="relative py-3">
+                <div className={cn("relative py-3", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-[var(--card-border)] opacity-80"></div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 w-[92%] mx-auto">
+                <div className={cn("grid grid-cols-2 gap-3 w-[92%] mx-auto", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
                     <button
                         className="relative group/btn flex items-center justify-center gap-2 px-3 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-full h-10 transition-all hover:bg-[var(--card-bg)] active:scale-[0.98]"
                         type="button"

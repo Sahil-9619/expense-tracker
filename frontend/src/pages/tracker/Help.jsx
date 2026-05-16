@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Book, MessageCircle, Mail, ExternalLink, HelpCircle, Terminal, Cpu, ChevronRight, Zap, Globe } from 'lucide-react';
 import { motion } from 'motion/react';
+import { BRAND_NAME } from '../../lib/constants';
 
 export default function Help() {
   const commands = [
@@ -40,7 +41,7 @@ export default function Help() {
               <div className="w-px h-3 bg-[var(--card-border)] mx-2" />
               <div className="flex items-center gap-2">
                 <Terminal size={12} className="text-emerald-500" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">SpendSync_Kernel_v2.0.4</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">{BRAND_NAME}_Kernel_v2.0.4</span>
               </div>
             </div>
             <span className="text-[8px] font-mono text-emerald-500/40">EST_SESSION_ID: AX-294</span>

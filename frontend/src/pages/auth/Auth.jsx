@@ -5,6 +5,7 @@ import { AuthForm } from './AuthForm';
 import { motion } from 'motion/react';
 import { Boxes } from '../../components/UI/background-boxes';
 import { AnimatedThemeToggler } from '../../components/UI/animated-theme-toggler';
+import { BRAND_NAME } from '../../lib/constants';
 
 export default function Auth({ onLogin }) {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ export default function Auth({ onLogin }) {
               <div className="bg-emerald-600 p-2.5 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover/logo:scale-110 transition-transform">
                 <HiOutlineSparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-black tracking-tighter text-[var(--text-primary)] uppercase group-hover/logo:text-emerald-500 transition-colors">SpendSync</span>
+              <span className="text-xl font-black tracking-tighter text-[var(--text-primary)] uppercase group-hover/logo:text-emerald-500 transition-colors">{BRAND_NAME}</span>
             </motion.div>
 
             <div className="space-y-10">
@@ -105,7 +106,7 @@ export default function Auth({ onLogin }) {
                 <HiOutlineSparkles className="w-5 h-5 text-white" />
               </motion.div>
               <h1 className="text-2xl font-black tracking-tighter text-[var(--text-primary)] uppercase mb-0.5">
-                SpendSync
+                {BRAND_NAME}
               </h1>
               <p className="text-emerald-500 text-[8px] font-black uppercase tracking-[0.3em] opacity-80">
                 Wealth Precision Tools
