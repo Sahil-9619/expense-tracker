@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, Shield, Bell, CreditCard, 
-  Globe, Zap, Camera, Terminal,
+  Zap, Camera, Terminal,
   ShieldCheck, Smartphone, Key
 } from 'lucide-react';
 import { toast } from "sonner";
 import { setUser as setReduxUser } from '../../redux/slices/authSlice';
+import { updateUserProfile } from '../../services/user.service';
 
 export default function Settings() {
   const { user } = useSelector((state) => state.auth);
@@ -21,10 +22,17 @@ export default function Settings() {
     email: user?.email || '',
   });
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    dispatch(setReduxUser({ ...user, ...formData }));
-    toast.success("System Identity Updated Successfully");
+    try {
+      const response = await updateUserProfile(user.id, formData);
+      const updatedUser = response.data || { ...user, ...formData };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      dispatch(setReduxUser(updatedUser));
+      toast.success("System Identity Updated Successfully");
+    } catch (err) {
+      toast.error(err.message || "Unable to update identity");
+    }
   };
 
   return (

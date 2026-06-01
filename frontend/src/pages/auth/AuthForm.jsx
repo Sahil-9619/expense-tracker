@@ -7,14 +7,16 @@ import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 
 export const AuthForm = ({ onLogin }) => {
     const [searchParams] = useSearchParams();
     const [type, setType] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
-    
+
     // Separate states for Login and Signup to prevent cross-filling
     const [loginData, setLoginData] = useState({
         email: "",
@@ -36,7 +38,7 @@ export const AuthForm = ({ onLogin }) => {
         confirmPassword: ""
     });
 
-    const { login, register, verifySignup, sendPasswordResetOtp, confirmPasswordReset, loading, setError } = useAuth();
+    const { login, register, verifySignup, sendPasswordResetOtp, confirmPasswordReset, googleLogin, loading, setError } = useAuth();
     const navigate = useNavigate();
     const isLogin = type === "login";
     const isSignup = type === "signup";
@@ -59,6 +61,7 @@ export const AuthForm = ({ onLogin }) => {
             setTermsAccepted(false);
             setError(null);
             setShowPassword(false);
+            setShowConfirmPassword(false);
             setSignupOtp("");
         }
     };
@@ -96,6 +99,7 @@ export const AuthForm = ({ onLogin }) => {
     const startForgotPassword = () => {
         setError(null);
         setShowPassword(false);
+        setShowConfirmPassword(false);
         setResetData({
             email: loginData.email,
             otp: "",
@@ -103,6 +107,25 @@ export const AuthForm = ({ onLogin }) => {
             confirmPassword: ""
         });
         setType("forgot");
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            setError(null);
+            const token = credentialResponse.credential;
+            await googleLogin(token);
+            toast.success("Google login successful! Welcome back.");
+            resetLoginForm();
+
+            if (onLogin) {
+                onLogin();
+            } else {
+                navigate("/dashboard");
+            }
+        } catch (err) {
+            toast.error(err.message || "Google login failed");
+            setError(err.message || "Google login failed");
+        }
     };
 
     const getSubmitLabel = () => {
@@ -169,7 +192,7 @@ export const AuthForm = ({ onLogin }) => {
             try {
                 await login(loginData.email, loginData.password);
                 toast.success("Login successful! Welcome back.");
-                
+
                 // CLEAR Login Form
                 resetLoginForm();
 
@@ -292,7 +315,24 @@ export const AuthForm = ({ onLogin }) => {
 
                                 <LabelInputContainer>
                                     <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                    <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={signupData.confirmPassword} onChange={handleSignupChange} required />
+                                    <div className="relative group">
+                                        <Input
+                                            id="confirmPassword"
+                                            placeholder="••••••••"
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            icon={HiOutlineLockClosed}
+                                            value={signupData.confirmPassword}
+                                            onChange={handleSignupChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
+                                        >
+                                            {showConfirmPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                 </LabelInputContainer>
                             </>
                         ) : isSignupOtp ? (
@@ -362,7 +402,24 @@ export const AuthForm = ({ onLogin }) => {
 
                                 <LabelInputContainer>
                                     <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                    <Input id="confirmPassword" placeholder="••••••••" type={showPassword ? "text" : "password"} icon={HiOutlineLockClosed} value={resetData.confirmPassword} onChange={handleResetChange} required />
+                                    <div className="relative group">
+                                        <Input
+                                            id="confirmPassword"
+                                            placeholder="••••••••"
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            icon={HiOutlineLockClosed}
+                                            value={resetData.confirmPassword}
+                                            onChange={handleResetChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500/60 hover:text-emerald-500 transition-colors z-30"
+                                        >
+                                            {showConfirmPassword ? <HiOutlineEyeSlash className="h-4 w-4" /> : <HiOutlineEye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
                                 </LabelInputContainer>
 
                                 <div className="w-full flex items-center justify-between px-3">
@@ -459,27 +516,31 @@ export const AuthForm = ({ onLogin }) => {
                     </div>
                 </div>
 
-                <div className={cn("grid grid-cols-2 gap-3 w-[92%] mx-auto", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
+                <div className={cn("flex flex-col gap-3 w-[92%] mx-auto mt-2", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
                     <button
                         className="relative group/btn flex items-center justify-center gap-2 px-3 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-full h-10 transition-all hover:bg-[var(--card-bg)] active:scale-[0.98]"
                         type="button"
                     >
-                        <FaGithub className="h-3.5 w-3.5 text-[var(--text-primary)]" />
-                        <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest">
-                            Github
+                        <FaGithub className="h-4 w-4 text-[var(--text-primary)]" />
+                        <span className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest">
+                            Continue with Github
                         </span>
                         <BottomGradient />
                     </button>
-                    <button
-                        className="relative group/btn flex items-center justify-center gap-2 px-3 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-full h-10 transition-all hover:bg-[var(--card-bg)] active:scale-[0.98]"
-                        type="button"
-                    >
-                        <FcGoogle className="h-3.5 w-3.5" />
-                        <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest">
-                            Google
-                        </span>
-                        <BottomGradient />
-                    </button>
+                    <div className="w-full flex justify-center rounded-full overflow-hidden">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                                toast.error("Google login failed");
+                                setError("Google login failed");
+                            }}
+                            theme="filled_black"
+                            size="large"
+                            text="continue_with"
+                            shape="pill"
+                            width="350"
+                        />
+                    </div>
                 </div>
             </form>
         </div>

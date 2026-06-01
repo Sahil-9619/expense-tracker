@@ -7,11 +7,13 @@ from expenses.views.auth_views import (
     reset_password,
     signup,
     verify_signup_otp,
+    google_signup,
 )
 
 urlpatterns = [
     path('signup/', signup),
     path('signup/verify-otp/', verify_signup_otp),
+    path('signup/google/', google_signup),
     path('login/', login),
     path('forgot-password/', forgot_password),
     path('reset-password/', reset_password),

@@ -24,10 +24,10 @@ export const Navbar = () => {
           : 'bg-[var(--card-bg)] backdrop-blur-md border-[var(--card-border)] rounded-full'
         }`}>
         <Link to="/" className="flex items-center gap-3 group cursor-pointer relative z-[110]">
-          <div className="bg-emerald-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+          <div className="bg-[var(--brand-primary)] p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-[0_0_20px_var(--brand-primary)] opacity-90">
             <HiSparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="text-lg font-black tracking-tighter uppercase text-[var(--text-primary)] font-display">{BRAND_NAME}</span>
+          <span className={`text-lg font-black tracking-tighter uppercase font-display transition-colors ${scrolled ? 'text-[var(--text-primary)]' : 'text-white'}`}>{BRAND_NAME}</span>
         </Link>
 
         {/* Desktop Menu */}
@@ -36,13 +36,13 @@ export const Navbar = () => {
             <a 
               key={link} 
               href={`#${link.toLowerCase()}`} 
-              className="relative text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-secondary)] hover:text-emerald-500 transition-all group/link"
+              className={`relative text-[10px] font-black uppercase tracking-[0.3em] transition-all group/link ${scrolled ? 'text-[var(--text-secondary)] hover:text-[var(--brand-primary)]' : 'text-white/70 hover:text-white'}`}
             >
               {link}
-              <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-emerald-500 scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 origin-center" />
+              <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-[var(--brand-primary)] scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 origin-center" />
             </a>
           ))}
-          <Link to="/auth" className="px-6 py-2 bg-emerald-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+          <Link to="/auth" className="px-6 py-2 bg-[var(--brand-primary)] text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:brightness-110 hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_var(--brand-primary)] opacity-80">
             Login
           </Link>
         </div>
@@ -54,7 +54,7 @@ export const Navbar = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-[var(--text-primary)] hover:bg-[var(--card-bg)] rounded-xl transition-all active:scale-90 cursor-pointer"
+            className={`md:hidden p-2 rounded-xl transition-all active:scale-90 cursor-pointer ${scrolled ? 'text-[var(--text-primary)] hover:bg-[var(--card-bg)]' : 'text-white hover:bg-white/10'}`}
           >
             {mobileMenuOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
           </button>
@@ -71,7 +71,7 @@ export const Navbar = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 onClick={() => setMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/40 md:hidden z-[102]"
+                className="fixed inset-0 bg-black/40 dark:bg-black/40 md:hidden z-[102]"
               />
 
               <motion.div
@@ -82,7 +82,7 @@ export const Navbar = () => {
                 className="fixed top-24 left-4 right-4 max-w-lg mx-auto bg-[var(--bg-color)] backdrop-blur-3xl border border-[var(--card-border)] rounded-[2rem] p-6 z-[105] shadow-[0_40px_100px_rgba(0,0,0,0.2)] md:hidden overflow-hidden"
               >
                 {/* Subtle Decorative Glow */}
-                <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] bg-emerald-600/10 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] bg-[var(--brand-primary)]/10 blur-[80px] rounded-full pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col gap-2">
                   {/* Small Left Aligned Links with Separators */}
@@ -96,7 +96,7 @@ export const Navbar = () => {
                       <a
                         href={`#${link.toLowerCase()}`}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`block w-full py-4 text-sm font-bold text-[var(--text-secondary)] hover:text-emerald-500 transition-colors ${i !== navLinks.length - 1 ? 'border-b border-[var(--card-border)]' : ''}`}
+                        className={`block w-full py-4 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors ${i !== navLinks.length - 1 ? 'border-b border-[var(--card-border)]' : ''}`}
                       >
                         {link}
                       </a>
@@ -107,7 +107,7 @@ export const Navbar = () => {
                     <Link
                       to="/auth"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-4 bg-emerald-600 text-white rounded-xl text-center text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_rgba(16,185,129,0.3)] hover:bg-emerald-500 transition-all"
+                      className="w-full py-4 bg-[var(--brand-primary)] text-white rounded-xl text-center text-[10px] font-black uppercase tracking-widest shadow-[0_15px_30px_var(--brand-primary)] opacity-80 hover:brightness-110 transition-all"
                     >
                       Login
                     </Link>

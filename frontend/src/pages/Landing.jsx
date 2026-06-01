@@ -9,7 +9,7 @@ import { Footer } from '../components/landing/Footer';
 export default function Landing() {
   return (
     <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-primary)] selection:bg-emerald-500/30 overflow-x-hidden font-sans relative transition-colors duration-500">
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none transform-gpu will-change-transform">
         <div
           className="absolute inset-0 opacity-[0.1]"
           style={{

@@ -21,6 +21,13 @@ export const verifySignupOtp = async (data) => {
     });
 };
 
+export const googleSignup = async (token) => {
+    return apiService('/auth/signup/google/', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+    });
+};
+
 export const requestPasswordReset = async (data) => {
     return apiService('/auth/forgot-password/', {
         method: 'POST',

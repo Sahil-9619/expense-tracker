@@ -26,7 +26,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
         <div className="bento-card p-1">
           <div className="bg-slate-950 rounded-[1.9rem] overflow-hidden">
             {/* Header */}
-            <div className="px-10 pt-10 pb-8 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+            <div className="px-10 pt-10 pb-8 flex items-center justify-between border-b border-[var(--card-border)] bg-[var(--card-bg)]">
               <div className="flex items-center gap-5">
                 <div className="bg-indigo-600 p-3 rounded-2xl shadow-[0_0_20px_rgba(79,70,229,0.4)]">
                   <Plus className="w-5 h-5 text-white" />
@@ -36,7 +36,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                   <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em] mt-1">Transaction Protocol Layer</p>
                 </div>
               </div>
-              <button onClick={onClose} className="p-3 text-slate-500 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-transparent hover:border-white/5">
+              <button onClick={onClose} className="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card-bg)] rounded-2xl transition-all border border-transparent hover:border-[var(--card-border)]">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -46,14 +46,14 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                 <button 
                   type="button"
                   onClick={() => setFormData({...formData, type: 'expense'})}
-                  className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'expense' ? 'bg-white text-slate-900 border-white' : 'bg-white/5 border-white/5 text-slate-500 hover:text-slate-300'}`}
+                  className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'expense' ? 'bg-[var(--text-primary)] text-[var(--bg-color)] border-[var(--text-primary)]' : 'bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >
                   Expense
                 </button>
                 <button 
                   type="button"
                   onClick={() => setFormData({...formData, type: 'income'})}
-                  className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'income' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-white/5 border-white/5 text-slate-500 hover:text-slate-300'}`}
+                  className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'income' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >
                   Inflow
                 </button>
@@ -91,7 +91,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                   <div className="relative group">
                     <Tag className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
                     <select 
-                      className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-14 py-4 text-sm font-bold text-white focus:bg-white/[0.05] focus:border-indigo-500/50 transition-all outline-none appearance-none cursor-pointer"
+                      className="w-full bg-[var(--input-bg)] border border-[var(--card-border)] rounded-2xl px-14 py-4 text-sm font-bold text-[var(--text-primary)] focus:bg-[var(--card-bg)] focus:border-indigo-500/50 transition-all outline-none appearance-none cursor-pointer"
                       value={formData.category}
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
                     >
@@ -128,7 +128,7 @@ function AuthInput({ icon: Icon, label, placeholder, type = "text", value, onCha
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-14 py-4 text-sm font-bold text-white placeholder:text-slate-700 focus:bg-white/[0.05] focus:border-indigo-500/50 transition-all outline-none"
+          className="w-full bg-[var(--input-bg)] border border-[var(--card-border)] rounded-2xl px-14 py-4 text-sm font-bold text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:bg-[var(--card-bg)] focus:border-indigo-500/50 transition-all outline-none"
         />
       </div>
     </div>

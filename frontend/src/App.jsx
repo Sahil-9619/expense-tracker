@@ -11,8 +11,8 @@ const ProtectedRoute = ({ children }) => {
     
     if (loading) {
         return (
-            <div className="h-screen w-full flex items-center justify-center bg-[#030712]">
-                <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="h-screen w-full flex items-center justify-center bg-[var(--bg-color)]">
+                <div className="w-8 h-8 border-4 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
     return (
-        <div className="min-h-screen bg-[#030712] text-slate-100 antialiased font-sans">
+        <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-primary)] antialiased font-sans">
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth onLogin={() => window.location.href = '/dashboard'} />} />

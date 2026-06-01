@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/auth/', include('expenses.urls.auth_urls')),
     path('api/users/', include('expenses.urls.user_urls')),
     path('api/expenses/', include('expenses.urls.expense_urls')),
+    path('api/tracker/', include('expenses.urls.tracker_urls')),
 
     #Swagger routes
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0)),

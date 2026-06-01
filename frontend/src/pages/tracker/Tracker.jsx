@@ -13,6 +13,17 @@ import Reports from './Reports';
 import Help from './Help';
 import TransactionDialog from '../../components/tracker/TransactionDialog';
 import { getExpenses, createExpense } from '../../services/expense.service';
+import {
+  createBudget,
+  createGoal,
+  createReport,
+  createWallet,
+  getBudgets,
+  getGoals,
+  getReportFolders,
+  getReports,
+  getWallets
+} from '../../services/tracker.service';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
 import { 
@@ -33,6 +44,11 @@ const categoryConfig = {
 
 export default function Tracker() {
   const [transactions, setTransactions] = useState([]);
+  const [wallets, setWallets] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [reportFolders, setReportFolders] = useState([]);
+  const [reports, setReports] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const { logout } = useAuth();
@@ -50,26 +66,89 @@ export default function Tracker() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTrackerData = useCallback(async () => {
     try {
-      const data = await getExpenses();
-      setTransactions(data);
+      const [
+        transactionData,
+        walletData,
+        budgetData,
+        goalData,
+        folderData,
+        reportData
+      ] = await Promise.all([
+        getExpenses(),
+        getWallets(),
+        getBudgets(),
+        getGoals(),
+        getReportFolders(),
+        getReports()
+      ]);
+
+      setTransactions(transactionData || []);
+      setWallets(walletData || []);
+      setBudgets(budgetData || []);
+      setGoals(goalData || []);
+      setReportFolders(folderData || []);
+      setReports(reportData || []);
     } catch {
-      toast.error('Unable to load transactions');
+      toast.error('Unable to load tracker data');
     }
   }, []);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    fetchTrackerData();
+  }, [fetchTrackerData]);
 
   const handleAddTransaction = async (txData) => {
     try {
-      await createExpense(txData);
+      await createExpense({
+        ...txData,
+        title: txData.description,
+      });
       toast.success('Transaction Synchronized Successfully');
-      fetchTransactions();
+      fetchTrackerData();
     } catch (err) {
       toast.error(err.message || 'Protocol Synchronization Failed');
+    }
+  };
+
+  const handleAddWallet = async (walletData) => {
+    try {
+      await createWallet(walletData);
+      toast.success('Liquidity Node Connected Successfully');
+      fetchTrackerData();
+    } catch (err) {
+      toast.error(err.message || 'Unable to connect wallet');
+    }
+  };
+
+  const handleAddBudget = async (budgetData) => {
+    try {
+      await createBudget(budgetData);
+      toast.success('Capital Threshold Initialized');
+      fetchTrackerData();
+    } catch (err) {
+      toast.error(err.message || 'Unable to initialize budget');
+    }
+  };
+
+  const handleAddGoal = async (goalData) => {
+    try {
+      await createGoal(goalData);
+      toast.success('Capital Phase Initialized');
+      fetchTrackerData();
+    } catch (err) {
+      toast.error(err.message || 'Unable to initialize goal');
+    }
+  };
+
+  const handleCreateReport = async () => {
+    try {
+      await createReport();
+      toast.success('Financial audit generated');
+      fetchTrackerData();
+    } catch (err) {
+      toast.error(err.message || 'Unable to generate report');
     }
   };
 
@@ -97,11 +176,14 @@ export default function Tracker() {
             <Route index element={
               <Dashboard 
                 transactions={transactions} 
+                wallets={wallets}
+                budgets={budgets}
+                goals={goals}
                 categoryConfig={categoryConfig}
                 onAddClick={() => setIsTxModalOpen(true)} 
               />
             } />
-            <Route path="wallets" element={<Wallets />} />
+            <Route path="wallets" element={<Wallets wallets={wallets} onAddWallet={handleAddWallet} transactions={transactions} />} />
             <Route path="transactions" element={
               <Transactions 
                 transactions={transactions} 
@@ -111,17 +193,20 @@ export default function Tracker() {
             <Route path="analytics" element={
               <Analytics 
                 transactions={transactions} 
+                wallets={wallets}
+                budgets={budgets}
+                goals={goals}
                 categoryConfig={categoryConfig} 
               />
             } />
-            <Route path="reports" element={<Reports />} />
-            <Route path="budgets" element={<Budgets />} />
-            <Route path="goals" element={<Goals />} />
+            <Route path="reports" element={<Reports folders={reportFolders} reports={reports} onCreateReport={handleCreateReport} />} />
+            <Route path="budgets" element={<Budgets budgets={budgets} transactions={transactions} onAddBudget={handleAddBudget} />} />
+            <Route path="goals" element={<Goals goals={goals} onAddGoal={handleAddGoal} />} />
             <Route path="settings" element={<Settings />} />
             <Route path="help" element={<Help />} />
             
             {/* Fallback routes */}
-            <Route path="*" element={<Dashboard transactions={transactions} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
+            <Route path="*" element={<Dashboard transactions={transactions} wallets={wallets} budgets={budgets} goals={goals} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
           </Routes>
         </main>
       </div>
@@ -131,6 +216,7 @@ export default function Tracker() {
         onOpenChange={setIsTxModalOpen}
         onAdd={handleAddTransaction}
         categoryConfig={categoryConfig}
+        wallets={wallets}
       />
     </div>
   );

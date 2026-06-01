@@ -12,7 +12,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-export default function Dashboard({ transactions = [], categoryConfig = {}, onAddClick }) {
+export default function Dashboard({ transactions = [], wallets = [], budgets = [], goals = [], categoryConfig = {}, onAddClick }) {
   const { balance, totalIncome, totalExpense } = useMemo(() => {
     return transactions.reduce((acc, curr) => {
       const amount = parseFloat(curr.amount);
@@ -30,6 +30,29 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
   const sortedTransactions = useMemo(() => {
     return [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
   }, [transactions]);
+
+  const walletBalance = useMemo(() => {
+    return wallets.reduce((sum, wallet) => sum + Number(wallet.balance || 0), 0);
+  }, [wallets]);
+
+  const savingsRate = totalIncome > 0 ? Math.max(((totalIncome - totalExpense) / totalIncome) * 100, 0) : 0;
+  const primaryWallet = wallets[0];
+  const targetGoal = goals.find((goal) => !goal.completed) || goals[0];
+  const assetDistribution = useMemo(() => {
+    return [
+      ...wallets.map((wallet) => ({
+        label: wallet.name,
+        amount: Number(wallet.balance || 0),
+        color: `bg-${wallet.color || 'emerald'}-500`,
+      })),
+      ...goals.map((goal) => ({
+        label: goal.title,
+        amount: Number(goal.current || 0),
+        color: `bg-${goal.color || 'indigo'}-500`,
+      })),
+    ].filter((asset) => asset.amount !== 0);
+  }, [wallets, goals]);
+  const assetTotal = assetDistribution.reduce((sum, asset) => sum + Math.abs(asset.amount), 0);
 
   const cardBase = "relative rounded-sm border border-[var(--card-border)] p-4 flex flex-col bg-[var(--card-bg)] transition-all duration-200 hover:shadow-lg hover:shadow-black/20";
 
@@ -95,11 +118,11 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
               <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Savings Rate</span>
               <button className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-secondary)]"><MoreVertical size={12} /></button>
             </div>
-            <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">67.2%</div>
+            <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">{savingsRate.toFixed(1)}%</div>
             <div className="w-full h-1.5 bg-[var(--bg-color)] rounded-full mt-auto mb-1 overflow-hidden border border-[var(--card-border)]">
-              <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 w-[67.2%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+              <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" style={{ width: `${Math.min(savingsRate, 100)}%` }}></div>
             </div>
-            <span className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">Target: 70%</span>
+            <span className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{budgets.length} budgets active</span>
           </div>
 
           {/* --- ROW 2: Advanced Main Chart & Quick Actions --- */}
@@ -140,9 +163,9 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><Wallet size={12} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">Main Checking</span>
+                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{primaryWallet?.name || 'No Wallet Connected'}</span>
                 </div>
-                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">₹{balance.toLocaleString()}</span>
+                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">₹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
               </div>
             </div>
 
@@ -157,7 +180,7 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-indigo-500/20 text-indigo-500 flex items-center justify-center"><PieChart size={12} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">S&P 500 Index</span>
+                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{targetGoal?.title || 'No Goal Selected'}</span>
                 </div>
                 <ChevronDown size={14} className="text-[var(--text-secondary)]" />
               </div>
@@ -234,12 +257,13 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)] mb-6">Asset Distribution</h2>
 
             <div className="flex flex-col gap-5">
-              {[
-                { label: 'Fiat Currency', value: '45.2%', amount: '₹56,302', color: 'bg-emerald-500' },
-                { label: 'Equities', value: '32.8%', amount: '₹40,856', color: 'bg-indigo-500' },
-                { label: 'Real Estate', value: '15.0%', amount: '₹18,684', color: 'bg-rose-500' },
-                { label: 'Crypto', value: '7.0%', amount: '₹8,720', color: 'bg-amber-500' },
-              ].map((asset, i) => (
+              {assetDistribution.length === 0 ? (
+                <div className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40 text-center py-6">
+                  No wallet or goal assets stored
+                </div>
+              ) : assetDistribution.map((asset, i) => {
+                const value = assetTotal ? (Math.abs(asset.amount) / assetTotal) * 100 : 0;
+                return (
                 <div key={i} className="flex flex-col gap-2">
                   <div className="flex justify-between items-end text-[10px]">
                     <div className="flex items-center gap-2">
@@ -247,15 +271,15 @@ export default function Dashboard({ transactions = [], categoryConfig = {}, onAd
                       <span className="font-black uppercase tracking-widest text-[var(--text-secondary)]">{asset.label}</span>
                     </div>
                     <div className="flex gap-2 items-center">
-                      <span className="text-[var(--text-secondary)] font-bold opacity-40">{asset.value}</span>
-                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">{asset.amount}</span>
+                      <span className="text-[var(--text-secondary)] font-bold opacity-40">{value.toFixed(1)}%</span>
+                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">₹{asset.amount.toLocaleString()}</span>
                     </div>
                   </div>
                   <div className="w-full h-1 bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
-                    <div className={`h-full ${asset.color} shadow-[0_0_10px_rgba(0,0,0,0.5)]`} style={{ width: asset.value }}></div>
+                    <div className={`h-full ${asset.color} shadow-[0_0_10px_rgba(0,0,0,0.5)]`} style={{ width: `${value}%` }}></div>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           </div>
 

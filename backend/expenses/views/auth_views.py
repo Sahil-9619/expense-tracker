@@ -16,6 +16,7 @@ from drf_yasg import openapi
 
 from expenses.serializers.user_serializer import UserSerializer, UserListSerializer
 from expenses.models import User, AuthOTP
+from expenses.services.google_oauth_service import verify_google_token, get_or_create_google_user
 
 
 def generate_otp():
@@ -264,3 +265,64 @@ def login(request):
 def get_user_profile(request):
     serializer = UserListSerializer(request.user)
     return Response(serializer.data)
+
+
+# GOOGLE SIGNUP/LOGIN ENDPOINT
+google_signup_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    required=['token'],
+    properties={
+        'token': openapi.Schema(type=openapi.TYPE_STRING, description='Google ID Token'),
+    }
+)
+
+
+@swagger_auto_schema(
+    method='post',
+    request_body=google_signup_schema,
+    responses={
+        200: openapi.Response("Google signup/login successful"),
+        400: "Invalid token or error"
+    }
+)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def google_signup(request):
+    """
+    Handle Google OAuth signup and login
+    """
+    token = request.data.get('token', '').strip()
+    
+    if not token:
+        return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not settings.GOOGLE_CLIENT_ID:
+        return Response(
+            {"error": "Google OAuth is not configured on the server"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Verify the Google token
+    idinfo, error = verify_google_token(token)
+    if error:
+        return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Get or create user from Google token
+    user, error = get_or_create_google_user(idinfo)
+    if error:
+        return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        "message": "Google authentication successful",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "is_active": user.is_active
+        }
+    }, status=status.HTTP_200_OK)

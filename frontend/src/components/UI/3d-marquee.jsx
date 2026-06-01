@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { motion } from "motion/react";
 import { cn } from "../../lib/utils";
 
 export const ThreeDMarquee = ({ images = [], className }) => {
@@ -36,9 +35,9 @@ export const ThreeDMarquee = ({ images = [], className }) => {
             </div>
 
             {/* Premium Gradient Overlays for Depth and Focus */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-[#030712]" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712]" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#030712_100%)] opacity-70" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] via-transparent to-[var(--bg-color)]" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[var(--bg-color)] via-transparent to-[var(--bg-color)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,var(--bg-color)_100%)] opacity-70 transform-gpu" />
         </div>
     );
 };
@@ -46,31 +45,26 @@ export const ThreeDMarquee = ({ images = [], className }) => {
 const MarqueeColumn = ({ images, speed = 40, reverse = false, offset = 0 }) => {
     return (
         <div className="flex flex-col gap-6">
-            <motion.div
-                style={{ pointerEvents: "none" }}
-                initial={{ y: reverse ? "-50%" : "0%" }}
-                animate={{ y: reverse ? "0%" : "-50%" }}
-                transition={{
-                    duration: speed,
-                    repeat: Infinity,
-                    ease: "linear",
+            <div
+                className={`flex flex-col gap-6 transform-gpu will-change-transform`}
+                style={{
+                    animation: `${reverse ? 'marquee-reverse-y' : 'marquee-y'} ${speed}s linear infinite`
                 }}
-                className="flex flex-col gap-6"
             >
                 {[...images, ...images].map((img, idx) => (
                     <div
                         key={idx}
-                        className="pointer-events-none group relative h-48 w-72 flex-shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-slate-900 shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-emerald-500/50 hover:shadow-emerald-500/20"
+                        className="pointer-events-none relative h-48 w-72 flex-shrink-0 overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] transform-gpu"
                     >
                         <img
                             src={img}
-                            className="pointer-events-none h-full w-full object-cover opacity-80 transition-all duration-700 group-hover:scale-110 group-hover:opacity-100"
+                            className="pointer-events-none h-full w-full object-cover opacity-80"
                             loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0" />
                     </div>
                 ))}
-            </motion.div>
+            </div>
         </div>
     );
 };

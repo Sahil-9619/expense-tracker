@@ -45,18 +45,16 @@ def expense_list(request):
 
     # GET (only user’s expenses)
     if request.method == 'GET':
-        expenses = get_all_expenses().filter(user=user)
+        expenses = get_all_expenses().filter(user=user).order_by('-date', '-created_at')
         serializer = ExpenseListSerializer(expenses, many=True)
         return Response(serializer.data)
 
     # CREATE (attach user)
     if request.method == 'POST':
-        serializer = ExpenseSerializer(data=request.data)
+        serializer = ExpenseSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
-            expense = create_expense(
-                {**serializer.validated_data, "user": user}
-            )
+            expense = create_expense({**serializer.validated_data, "user": user})
             return Response(
                 ExpenseSerializer(expense).data,
                 status=status.HTTP_201_CREATED
@@ -116,7 +114,7 @@ def expense_detail(request, id):
 
     # UPDATE
     if request.method == 'PUT':
-        serializer = ExpenseSerializer(expense, data=request.data)
+        serializer = ExpenseSerializer(expense, data=request.data, partial=True, context={'request': request})
 
         if serializer.is_valid():
             updated = update_expense(expense, serializer.validated_data)

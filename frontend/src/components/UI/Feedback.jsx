@@ -33,7 +33,7 @@ export function LoadingScreen() {
       
       <div className="flex flex-col items-center gap-10 relative z-10">
         <div className="relative">
-          <div className="w-24 h-24 border-4 border-white/5 border-t-indigo-600 rounded-full animate-spin"></div>
+          <div className="w-24 h-24 border-4 border-[var(--card-border)] border-t-[var(--brand-primary)] rounded-full animate-spin"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-10 h-10 bg-indigo-600 rounded-full animate-pulse shadow-[0_0_30px_rgba(79,70,229,0.5)]"></div>
           </div>

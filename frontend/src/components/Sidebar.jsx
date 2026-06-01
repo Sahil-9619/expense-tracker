@@ -146,7 +146,7 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
 
                     {/* Tooltip for collapsed state */}
                     {!isOpen && (
-                      <span className="absolute left-full ml-4 px-2 py-1 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[100] border border-white/10 shadow-xl">
+                      <span className="absolute left-full ml-4 px-2 py-1 bg-[var(--card-bg)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest rounded-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all pointer-events-none whitespace-nowrap z-[100] border border-[var(--card-border)] shadow-xl">
                         {item.label}
                       </span>
                     )}
@@ -162,7 +162,7 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
           {isOpen ? (
             <div className="flex flex-col gap-4 mb-2">
               <div className="flex items-center gap-3 px-2 py-1">
-                <div className="w-8 h-8 rounded-sm bg-gradient-to-tr from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-black text-sm shadow-lg overflow-hidden shrink-0 border border-white/10">
+                <div className="w-8 h-8 rounded-sm bg-gradient-to-tr from-[var(--brand-primary)] to-emerald-600 flex items-center justify-center text-white font-black text-sm shadow-lg overflow-hidden shrink-0 border border-[var(--card-border)]">
                   {user?.profile_pic ? (
                     <img src={user.profile_pic} alt="User" className="w-full h-full object-cover" />
                   ) : (

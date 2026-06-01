@@ -1,33 +1,13 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Target, Trophy, Clock, Plus, ArrowRight, Flag, ShieldCheck, Zap } from 'lucide-react';
+import { Target, Trophy, Clock, Plus, Flag, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import GoalDialog from '../../components/tracker/GoalDialog';
-import { toast } from 'sonner';
 
-const initialGoals = [
-  { title: 'New MacBook Pro', target: 250000, current: 180000, deadline: 'Dec 2024', icon: Trophy, color: 'emerald' },
-  { title: 'Europe Trip', target: 500000, current: 150000, deadline: 'Aug 2025', icon: Target, color: 'indigo' },
-  { title: 'Emergency Fund', target: 300000, current: 300000, deadline: 'Completed', icon: Target, color: 'emerald', completed: true },
-];
-
-export default function Goals() {
-  const [goals, setGoals] = useState(initialGoals);
+export default function Goals({ goals = [], onAddGoal }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAddGoal = (data) => {
-    const newGoal = {
-      title: data.title,
-      target: parseFloat(data.target),
-      current: 0,
-      deadline: data.deadline,
-      icon: Target,
-      color: 'emerald'
-    };
-    setGoals([...goals, newGoal]);
-    toast.success('Capital Phase Initialized');
-  };
+  const completedCount = goals.filter(g => g.completed).length;
 
   return (
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -36,26 +16,22 @@ export default function Goals() {
           <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Capital Objectives</h1>
           <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Phase-based wealth accumulation</p>
         </div>
-        <Button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest h-8 px-4"
-        >
+        <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest h-8 px-4">
           <Plus className="mr-2 h-3 w-3" /> Initialize Phase
         </Button>
       </div>
 
       <div className="grid grid-cols-12 gap-4">
-        {/* Objectives Progress Sidebar */}
         <div className="col-span-12 lg:col-span-3 space-y-4">
           <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-5 space-y-6">
             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Phase Distribution</h2>
             <div className="space-y-6 relative">
               <div className="absolute left-3.5 top-0 bottom-0 w-px bg-[var(--card-border)] border-dashed border-l" />
-              
-              <PhaseItem status="Complete" label="Safety Buffer" active />
-              <PhaseItem status="In Progress" label="Tech Infrastructure" active />
-              <PhaseItem status="Upcoming" label="Global Mobility" />
-              <PhaseItem status="Locked" label="Property Assets" />
+              {goals.length === 0 ? (
+                <PhaseItem status="Empty" label="No Objectives" />
+              ) : goals.slice(0, 4).map((goal) => (
+                <PhaseItem key={goal.id} status={goal.completed ? 'Complete' : 'In Progress'} label={goal.title} active={!goal.completed} />
+              ))}
             </div>
           </Card>
 
@@ -65,36 +41,34 @@ export default function Goals() {
             </div>
             <div>
               <span className="text-[10px] font-black uppercase tracking-tight text-emerald-500">Hall of Achievement</span>
-              <p className="text-[8px] text-emerald-500/60 font-bold uppercase tracking-widest">{goals.filter(g => g.completed).length} Nodes Completed</p>
+              <p className="text-[8px] text-emerald-500/60 font-bold uppercase tracking-widest">{completedCount} Nodes Completed</p>
             </div>
           </Card>
         </div>
 
-        {/* Milestone Vertical Visualization */}
         <div className="col-span-12 lg:col-span-9 space-y-4">
-          {goals.map((goal, i) => {
-            const percentage = (goal.current / goal.target) * 100;
+          {goals.length === 0 ? (
+            <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-10 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-40">
+              No objectives stored
+            </Card>
+          ) : goals.map((goal, i) => {
+            const current = Number(goal.current || 0);
+            const target = Number(goal.target || 0);
+            const percentage = target ? (current / target) * 100 : 0;
+            const Icon = goal.completed ? Trophy : Target;
             return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className={`
-                  bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-5 relative overflow-hidden group hover:border-emerald-500/30 transition-all
-                  ${goal.completed ? 'opacity-60' : ''}
-                `}>
+              <motion.div key={goal.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
+                <Card className={`bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-5 relative overflow-hidden group hover:border-emerald-500/30 transition-all ${goal.completed ? 'opacity-60' : ''}`}>
                   <div className="grid grid-cols-12 gap-6 items-center">
                     <div className="col-span-12 md:col-span-4 flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-sm bg-${goal.color}-500/10 text-${goal.color}-500 flex items-center justify-center shrink-0 border border-${goal.color}-500/20`}>
-                        <goal.icon size={22} />
+                        <Icon size={22} />
                       </div>
                       <div className="flex flex-col min-w-0">
                         <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-tight truncate">{goal.title}</h3>
                         <div className="flex items-center gap-2">
                           <Clock size={10} className="text-[var(--text-secondary)] opacity-40" />
-                          <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-60">{goal.deadline}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-60">{goal.deadline || 'No deadline'}</span>
                         </div>
                       </div>
                     </div>
@@ -105,19 +79,14 @@ export default function Goals() {
                         <span className="text-[10px] font-black font-mono text-emerald-500">{percentage.toFixed(1)}%</span>
                       </div>
                       <div className="h-1.5 w-full bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
-                          transition={{ duration: 1.5, ease: "easeOut" }}
-                          className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                        />
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(percentage, 100)}%` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                       </div>
                     </div>
 
                     <div className="col-span-12 md:col-span-3 text-right">
                       <div className="flex flex-col">
-                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">₹{goal.current.toLocaleString()}</span>
-                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: ₹{goal.target.toLocaleString()}</span>
+                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">₹{current.toLocaleString()}</span>
+                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: ₹{target.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -135,10 +104,7 @@ export default function Goals() {
             );
           })}
 
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-full py-10 border border-dashed border-[var(--card-border)] rounded-sm flex flex-col items-center justify-center gap-3 group hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all"
-          >
+          <button onClick={() => setIsModalOpen(true)} className="w-full py-10 border border-dashed border-[var(--card-border)] rounded-sm flex flex-col items-center justify-center gap-3 group hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all">
             <div className="w-10 h-10 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:scale-110 transition-transform">
               <Plus size={20} />
             </div>
@@ -147,11 +113,7 @@ export default function Goals() {
         </div>
       </div>
 
-      <GoalDialog 
-        isOpen={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        onAdd={handleAddGoal}
-      />
+      <GoalDialog isOpen={isModalOpen} onOpenChange={setIsModalOpen} onAdd={onAddGoal} />
     </div>
   );
 }
@@ -159,10 +121,7 @@ export default function Goals() {
 function PhaseItem({ status, label, active = false }) {
   return (
     <div className="flex items-center gap-4 relative z-10 group cursor-pointer">
-      <div className={`
-        w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all
-        ${active ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-[var(--bg-color)] border-[var(--card-border)] text-[var(--text-secondary)]'}
-      `}>
+      <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${active ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-[var(--bg-color)] border-[var(--card-border)] text-[var(--text-secondary)]'}`}>
         {active ? <Flag size={12} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-[var(--card-border)]" />}
       </div>
       <div className="flex flex-col min-w-0">

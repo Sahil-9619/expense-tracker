@@ -62,7 +62,7 @@ export default function Header({ isSidebarOpen, onToggleSidebar }) {
           </div>
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 to-emerald-600 border border-white/10 shadow-lg flex items-center justify-center text-white font-black cursor-pointer overflow-hidden"
+            className="w-10 h-10 rounded-xl bg-[var(--brand-primary)] border border-[var(--card-border)] shadow-lg flex items-center justify-center text-white font-black cursor-pointer overflow-hidden"
           >
             {user?.profile_pic ? (
               <img src={user.profile_pic} alt="Profile" className="w-full h-full object-cover" />

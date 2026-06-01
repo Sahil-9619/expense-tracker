@@ -6,6 +6,7 @@ import {
     requestPasswordReset,
     resetPassword,
     verifySignupOtp,
+    googleSignup,
 } from '../services/auth.service';
 import { setUser as setReduxUser, logout as logoutRedux } from '../redux/slices/authSlice';
 
@@ -37,10 +38,10 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             localStorage.setItem('user', JSON.stringify(data.user));
-            
+
             setUser(data.user);
             dispatch(setReduxUser(data.user)); // Update Redux
-            
+
             return data;
         } catch (err) {
             setError(err.message);
@@ -103,6 +104,27 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const googleLogin = async (token) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await googleSignup(token);
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            setUser(data.user);
+            dispatch(setReduxUser(data.user));
+
+            return data;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
@@ -121,6 +143,7 @@ export const AuthProvider = ({ children }) => {
             verifySignup,
             sendPasswordResetOtp,
             confirmPasswordReset,
+            googleLogin,
             logout,
             setError,
         }}>

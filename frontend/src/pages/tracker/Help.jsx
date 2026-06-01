@@ -63,7 +63,7 @@ export default function Help() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="p-3 rounded-sm bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer group/cmd"
+                    className="p-3 rounded-sm bg-[var(--card-bg)] border border-[var(--card-border)] hover:border-[var(--brand-primary)] transition-all cursor-pointer group/cmd"
                   >
                     <span className="text-emerald-500 text-[10px] font-black">{c.cmd}</span>
                     <p className="text-[9px] text-[var(--text-secondary)] mt-1 opacity-60 group-hover/cmd:opacity-100 transition-opacity">{c.desc}</p>

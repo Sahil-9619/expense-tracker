@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -14,6 +15,7 @@ from expenses.utils.password_utils import hash_password
 
 #GET ALL 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def user_list(request):
 
     users = get_all_users()
@@ -22,6 +24,7 @@ def user_list(request):
 
 #GET BY ID
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def user_detail(request, id):
 
     user = get_user_by_id(id)
