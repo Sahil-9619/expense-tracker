@@ -87,7 +87,18 @@ const apiService = async (endpoint, options = {}) => {
         }
 
         if (!response.ok) {
-            const errorMsg = data?.error || data?.detail || (data?.email ? data.email[0] : null) || (data?.password ? data.password[0] : null) || 'Something went wrong';
+            let errorMsg = 'Something went wrong';
+            
+            if (response.status >= 500) {
+                errorMsg = 'An unexpected server error occurred. Please try again later.';
+            } else {
+                errorMsg = data?.error || data?.detail || (data?.email ? data.email[0] : null) || (data?.password ? data.password[0] : null) || 'Something went wrong';
+                
+                // Final safety check to prevent rendering HTML tracebacks or huge technical strings
+                if (typeof errorMsg === 'string' && (errorMsg.includes('<html') || errorMsg.includes('<!DOCTYPE') || errorMsg.length > 200)) {
+                    errorMsg = 'A technical error occurred. Please try again.';
+                }
+            }
             throw new Error(errorMsg);
         }
 

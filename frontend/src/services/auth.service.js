@@ -21,10 +21,10 @@ export const verifySignupOtp = async (data) => {
     });
 };
 
-export const googleSignup = async (token) => {
+export const googleSignup = async (token, action = 'login') => {
     return apiService('/auth/signup/google/', {
         method: 'POST',
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, action }),
     });
 };
 

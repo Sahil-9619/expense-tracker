@@ -9,13 +9,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
+import { useTheme } from "../../context/ThemeContext";
 
-export const AuthForm = ({ onLogin }) => {
+export const AuthForm = ({ onLogin, onTypeChange }) => {
     const [searchParams] = useSearchParams();
     const [type, setType] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const { theme } = useTheme();
 
     // Separate states for Login and Signup to prevent cross-filling
     const [loginData, setLoginData] = useState({
@@ -48,16 +50,15 @@ export const AuthForm = ({ onLogin }) => {
 
     useEffect(() => {
         const mode = searchParams.get("mode");
-        if (mode === "signup") {
-            setType("signup");
-        } else if (mode === "login") {
-            setType("login");
-        }
-    }, [searchParams]);
+        const newType = mode === "signup" ? "signup" : "login";
+        setType(newType);
+        if (onTypeChange) onTypeChange(newType);
+    }, [searchParams, onTypeChange]);
 
     const toggleType = (newType) => {
         if (newType !== type) {
             setType(newType);
+            if (onTypeChange) onTypeChange(newType);
             setTermsAccepted(false);
             setError(null);
             setShowPassword(false);
@@ -107,14 +108,15 @@ export const AuthForm = ({ onLogin }) => {
             confirmPassword: ""
         });
         setType("forgot");
+        if (onTypeChange) onTypeChange("forgot");
     };
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             setError(null);
             const token = credentialResponse.credential;
-            await googleLogin(token);
-            toast.success("Google login successful! Welcome back.");
+            await googleLogin(token, type);
+            toast.success(type === "login" ? "Google login successful! Welcome back." : "Google signup successful! Welcome.");
             resetLoginForm();
 
             if (onLogin) {
@@ -154,6 +156,7 @@ export const AuthForm = ({ onLogin }) => {
                 await register(signupData.name, signupData.email, signupData.password);
                 toast.success("OTP sent to your email. Verify your account to continue.");
                 setType("signupOtp");
+                if (onTypeChange) onTypeChange("signupOtp");
             } catch (err) {
                 toast.error(err.message || "Registration failed");
             }
@@ -163,6 +166,7 @@ export const AuthForm = ({ onLogin }) => {
                 toast.success("Email verified successfully. Please login.");
                 resetSignupForm();
                 setType("login");
+                if (onTypeChange) onTypeChange("login");
             } catch (err) {
                 toast.error(err.message || "OTP verification failed");
             }
@@ -171,6 +175,7 @@ export const AuthForm = ({ onLogin }) => {
                 await sendPasswordResetOtp(resetData.email);
                 toast.success("Password reset OTP sent to your email.");
                 setType("resetPassword");
+                if (onTypeChange) onTypeChange("resetPassword");
             } catch (err) {
                 toast.error(err.message || "Could not send reset OTP");
             }
@@ -185,6 +190,7 @@ export const AuthForm = ({ onLogin }) => {
                 setLoginData({ email: resetData.email, password: "" });
                 setResetData({ email: "", otp: "", password: "", confirmPassword: "" });
                 setType("login");
+                if (onTypeChange) onTypeChange("login");
             } catch (err) {
                 toast.error(err.message || "Password reset failed");
             }
@@ -517,28 +523,17 @@ export const AuthForm = ({ onLogin }) => {
                 </div>
 
                 <div className={cn("flex flex-col gap-3 w-[92%] mx-auto mt-2", (isSignupOtp || isForgot || isResetPassword) && "hidden")}>
-                    <button
-                        className="relative group/btn flex items-center justify-center gap-2 px-3 w-full bg-[var(--card-bg)] border border-[var(--card-border)] rounded-full h-10 transition-all hover:bg-[var(--card-bg)] active:scale-[0.98]"
-                        type="button"
-                    >
-                        <FaGithub className="h-4 w-4 text-[var(--text-primary)]" />
-                        <span className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest">
-                            Continue with Github
-                        </span>
-                        <BottomGradient />
-                    </button>
-                    <div className="w-full flex justify-center rounded-full overflow-hidden">
+                    <div className="w-full flex justify-center items-center rounded-full">
                         <GoogleLogin
                             onSuccess={handleGoogleSuccess}
                             onError={() => {
                                 toast.error("Google login failed");
                                 setError("Google login failed");
                             }}
-                            theme="filled_black"
+                            theme={theme === "dark" ? "filled_black" : "outline"}
                             size="large"
                             text="continue_with"
                             shape="pill"
-                            width="350"
                         />
                     </div>
                 </div>

@@ -1,14 +1,18 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { cn } from "../../lib/utils";
 import { HiOutlineSparkles, HiOutlineShieldCheck, HiArrowLeft } from 'react-icons/hi2';
 import { AuthForm } from './AuthForm';
 import { motion } from 'motion/react';
 import { Boxes } from '../../components/UI/background-boxes';
 import { AnimatedThemeToggler } from '../../components/UI/animated-theme-toggler';
 import { BRAND_NAME } from '../../lib/constants';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Auth({ onLogin }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [formType, setFormType] = React.useState(searchParams.get("mode") === "signup" ? "signup" : "login");
 
   return (
     <div className="h-screen bg-[var(--bg-color)] flex flex-col md:flex-row relative overflow-hidden font-sans selection:bg-emerald-500/30 transition-colors duration-500">
@@ -94,7 +98,7 @@ export default function Auth({ onLogin }) {
           <Boxes />
         </div>
 
-        <div className="absolute inset-0 z-20 overflow-y-auto custom-scrollbar flex flex-col p-4 sm:p-8">
+        <div className={cn("absolute inset-0 z-20 flex flex-col p-4 sm:p-8", formType === "signup" ? "overflow-y-auto custom-scrollbar" : "overflow-hidden")}>
           <div className="w-full max-w-[420px] mx-auto my-auto py-8 relative">
             {/* Mobile Header (Replaced "Protocol Access" with Logo) */}
             <div className="text-center mb-8 md:hidden cursor-pointer group" onClick={() => navigate('/')}>
@@ -118,7 +122,7 @@ export default function Auth({ onLogin }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <AuthForm onLogin={onLogin} />
+              <AuthForm onLogin={onLogin} onTypeChange={setFormType} />
             </motion.div>
 
             <div className="mt-8 flex items-center justify-center gap-2.5 text-[var(--text-secondary)]">

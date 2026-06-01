@@ -104,11 +104,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const googleLogin = async (token) => {
+    const googleLogin = async (token, action = 'login') => {
         setLoading(true);
         setError(null);
         try {
-            const data = await googleSignup(token);
+            const data = await googleSignup(token, action);
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             localStorage.setItem('user', JSON.stringify(data.user));

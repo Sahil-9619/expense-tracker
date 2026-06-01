@@ -94,7 +94,7 @@ def signup(request):
     existing_user = User.objects.filter(email=email).first()
 
     if existing_user and existing_user.is_active:
-        return Response({"email": ["Email already exists"]}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "User already exists. Please log in."}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = UserSerializer(existing_user, data=request.data) if existing_user else UserSerializer(data=request.data)
     if serializer.is_valid():
@@ -228,6 +228,9 @@ def login(request):
     if not password:
         return Response({"error": "Password required"}, status=400)
 
+    if not User.objects.filter(email=email).exists():
+        return Response({"error": "User does not exist"}, status=404)
+
     inactive_user = User.objects.filter(email=email, is_active=False).first()
     if inactive_user and inactive_user.check_password(password):
         return Response({"error": "Please verify your email before logging in"}, status=400)
@@ -292,6 +295,7 @@ def google_signup(request):
     Handle Google OAuth signup and login
     """
     token = request.data.get('token', '').strip()
+    action = request.data.get('action', 'login').strip()
     
     if not token:
         return Response({"error": "Google token is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -308,7 +312,7 @@ def google_signup(request):
         return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
     
     # Get or create user from Google token
-    user, error = get_or_create_google_user(idinfo)
+    user, error = get_or_create_google_user(idinfo, action)
     if error:
         return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
     

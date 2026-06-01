@@ -16,7 +16,8 @@ def verify_google_token(token):
         idinfo = id_token.verify_oauth2_token(
             token,
             requests.Request(),
-            settings.GOOGLE_CLIENT_ID
+            settings.GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=60
         )
         
         # Check if token is for the correct app
@@ -27,10 +28,10 @@ def verify_google_token(token):
         return idinfo, None
     except Exception as e:
         logger.error(f"Token verification failed: {str(e)}")
-        return None, f"Token verification failed: {str(e)}"
+        return None, "Google authentication failed. Please try again or check your connection."
 
 
-def get_or_create_google_user(idinfo):
+def get_or_create_google_user(idinfo, action='login'):
     """
     Get or create a user from Google token info
     Returns user object or error message
@@ -52,6 +53,9 @@ def get_or_create_google_user(idinfo):
         user = User.objects.filter(email=email).first()
         
         if user:
+            if action == 'signup':
+                return None, "User already exists. Please log in."
+                
             # Update google_id if not set
             if not user.google_id:
                 user.google_id = google_id
@@ -60,10 +64,13 @@ def get_or_create_google_user(idinfo):
             user.save(update_fields=['google_id', 'is_active'])
             return user, None
         
+        if action == 'login':
+            return None, "User does not exist. Please sign up first."
+        
         # Create new user
         full_name = f"{first_name} {last_name}".strip() or email.split('@')[0]
         
-        user = User.objects.create_user(
+        user = User(
             email=email,
             name=full_name,
             google_id=google_id,
@@ -78,4 +85,4 @@ def get_or_create_google_user(idinfo):
         
     except Exception as e:
         logger.error(f"Error creating/retrieving user: {str(e)}")
-        return None, f"Error processing user data: {str(e)}"
+        return None, "An error occurred while setting up your account. Please try again."
