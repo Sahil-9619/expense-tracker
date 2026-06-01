@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Target, Trophy, Clock, Plus, Flag, ShieldCheck } from 'lucide-react';
@@ -13,22 +13,22 @@ export default function Goals({ goals = [], onAddGoal }) {
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-end justify-between px-2">
         <div>
-          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Capital Objectives</h1>
-          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Phase-based wealth accumulation</p>
+          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Financial Goals</h1>
+          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Track your savings goals</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest h-8 px-4">
-          <Plus className="mr-2 h-3 w-3" /> Initialize Phase
+          <Plus className="mr-2 h-3 w-3" /> Create Goal
         </Button>
       </div>
 
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 lg:col-span-3 space-y-4">
           <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-5 space-y-6">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Phase Distribution</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Goal Progress</h2>
             <div className="space-y-6 relative">
               <div className="absolute left-3.5 top-0 bottom-0 w-px bg-[var(--card-border)] border-dashed border-l" />
               {goals.length === 0 ? (
-                <PhaseItem status="Empty" label="No Objectives" />
+                <PhaseItem status="Empty" label="No Goals" />
               ) : goals.slice(0, 4).map((goal) => (
                 <PhaseItem key={goal.id} status={goal.completed ? 'Complete' : 'In Progress'} label={goal.title} active={!goal.completed} />
               ))}
@@ -40,8 +40,8 @@ export default function Goals({ goals = [], onAddGoal }) {
               <Trophy size={18} />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-tight text-emerald-500">Hall of Achievement</span>
-              <p className="text-[8px] text-emerald-500/60 font-bold uppercase tracking-widest">{completedCount} Nodes Completed</p>
+              <span className="text-[10px] font-black uppercase tracking-tight text-emerald-500">Completed Goals</span>
+              <p className="text-[8px] text-emerald-500/60 font-bold uppercase tracking-widest">{completedCount} Goals Completed</p>
             </div>
           </Card>
         </div>
@@ -49,7 +49,7 @@ export default function Goals({ goals = [], onAddGoal }) {
         <div className="col-span-12 lg:col-span-9 space-y-4">
           {goals.length === 0 ? (
             <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-10 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-40">
-              No objectives stored
+              No goals found
             </Card>
           ) : goals.map((goal, i) => {
             const current = Number(goal.current || 0);
@@ -75,7 +75,7 @@ export default function Goals({ goals = [], onAddGoal }) {
 
                     <div className="col-span-12 md:col-span-5 flex flex-col gap-2">
                       <div className="flex justify-between items-center px-1">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Phase Completion</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Progress</span>
                         <span className="text-[10px] font-black font-mono text-emerald-500">{percentage.toFixed(1)}%</span>
                       </div>
                       <div className="h-1.5 w-full bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
@@ -85,8 +85,8 @@ export default function Goals({ goals = [], onAddGoal }) {
 
                     <div className="col-span-12 md:col-span-3 text-right">
                       <div className="flex flex-col">
-                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">₹{current.toLocaleString()}</span>
-                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: ₹{target.toLocaleString()}</span>
+                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">â‚¹{current.toLocaleString()}</span>
+                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: â‚¹{target.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
@@ -95,7 +95,7 @@ export default function Goals({ goals = [], onAddGoal }) {
                     <div className="absolute top-0 right-0 p-2">
                       <div className="bg-emerald-600 text-white border-none rounded-sm px-2 py-0.5 flex items-center gap-1">
                         <ShieldCheck size={10} />
-                        <span className="text-[8px] font-black uppercase tracking-widest">Secured</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest">Completed</span>
                       </div>
                     </div>
                   )}
@@ -108,7 +108,7 @@ export default function Goals({ goals = [], onAddGoal }) {
             <div className="w-10 h-10 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:scale-110 transition-transform">
               <Plus size={20} />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Initialize New Phase</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Create New Goal</span>
           </button>
         </div>
       </div>
@@ -131,3 +131,4 @@ function PhaseItem({ status, label, active = false }) {
     </div>
   );
 }
+

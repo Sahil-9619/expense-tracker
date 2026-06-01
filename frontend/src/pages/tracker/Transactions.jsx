@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { 
   Table, 
   TableBody, 
@@ -30,18 +30,18 @@ export default function Transactions({ transactions = [], onAddClick }) {
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div>
-          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Protocol Ledger</h1>
-          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Sequence of financial operations</p>
+          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Transactions</h1>
+          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Your recent transactions and history</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="h-8 text-[9px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] text-[var(--text-primary)] px-4">
-            <Download className="mr-2 h-3 w-3" /> Export Audit
+            <Download className="mr-2 h-3 w-3" /> Export Data
           </Button>
           <Button 
             onClick={onAddClick}
             className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-sm shadow-lg shadow-emerald-500/20 px-4"
           >
-            <Plus className="mr-2 h-3 w-3" /> New Sequence
+            <Plus className="mr-2 h-3 w-3" /> Add Transaction
           </Button>
         </div>
       </div>
@@ -51,11 +51,11 @@ export default function Transactions({ transactions = [], onAddClick }) {
         <div className="col-span-12 lg:col-span-3 space-y-4">
           <Card className="bg-[var(--card-bg)] border-[var(--card-border)] rounded-sm p-4 space-y-6">
             <div className="space-y-3">
-              <label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Search Terminal</label>
+              <label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Search</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--text-secondary)] opacity-40" />
                 <Input 
-                  placeholder="Query protocol..." 
+                  placeholder="Search transactions..." 
                   className="pl-9 h-9 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-[10px] font-bold placeholder:opacity-30"
                 />
               </div>
@@ -64,10 +64,10 @@ export default function Transactions({ transactions = [], onAddClick }) {
             <div className="space-y-4">
               <label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Quick Filters</label>
               <div className="flex flex-col gap-2">
-                <FilterButton label="High Magnitude" active={true} />
-                <FilterButton label="Income Nodes" />
-                <FilterButton label="Expense Strings" />
-                <FilterButton label="Pending Sync" />
+                <FilterButton label="High Amount" active={true} />
+                <FilterButton label="Income Only" />
+                <FilterButton label="Expenses Only" />
+                <FilterButton label="Pending" />
               </div>
             </div>
 
@@ -81,10 +81,10 @@ export default function Transactions({ transactions = [], onAddClick }) {
           <Card className="bg-emerald-500/5 border border-emerald-500/10 rounded-sm p-4">
             <div className="flex items-center gap-2 mb-2">
               <History size={12} className="text-emerald-500" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Node Sync Status</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Sync Status</span>
             </div>
             <p className="text-[8px] text-emerald-500/60 font-bold uppercase leading-relaxed">
-              All {transactions.length} transactions from the current epoch are cryptographically verified and synced with primary nodes.
+              All {transactions.length} transactions from the current epoch are saved and synced securely.
             </p>
           </Card>
         </div>
@@ -96,9 +96,9 @@ export default function Transactions({ transactions = [], onAddClick }) {
               <Table>
                 <TableHeader className="bg-[var(--bg-color)]/50 sticky top-0 z-10">
                   <TableRow className="border-b border-[var(--card-border)] hover:bg-transparent">
-                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] py-3 px-6">Timestamp / Merchant</TableHead>
-                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Category Hub</TableHead>
-                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] text-right px-6">Magnitude (INR)</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] py-3 px-6">Date / Merchant</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Category</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] text-right px-6">Amount (INR)</TableHead>
                     <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -106,7 +106,7 @@ export default function Transactions({ transactions = [], onAddClick }) {
                   {transactions.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="h-32 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-20">
-                        Zero Sequences Detected
+                        No transactions found
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -142,7 +142,7 @@ export default function Transactions({ transactions = [], onAddClick }) {
                         <TableCell className="text-right px-6">
                           <div className="flex flex-col items-end">
                             <span className={`text-[11px] font-black font-mono tracking-tighter ${tx.type === 'income' ? 'text-emerald-500' : 'text-[var(--text-primary)]'}`}>
-                              {tx.type === 'income' ? '+' : '-'}₹{parseFloat(tx.amount).toLocaleString()}
+                              {tx.type === 'income' ? '+' : '-'}â‚¹{parseFloat(tx.amount).toLocaleString()}
                             </span>
                             <span className="text-[8px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Confirmed</span>
                           </div>
@@ -163,7 +163,7 @@ export default function Transactions({ transactions = [], onAddClick }) {
             
             <div className="p-4 border-t border-[var(--card-border)] bg-[var(--bg-color)]/30 flex items-center justify-between">
               <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-50">
-                Audit complete. {transactions.length} records active.
+                Sync complete. {transactions.length} transactions found.
               </span>
               <div className="flex gap-1">
                 <Button variant="outline" className="h-7 text-[8px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)]">Prior</Button>
@@ -190,3 +190,4 @@ function FilterButton({ label, active = false }) {
     </button>
   );
 }
+

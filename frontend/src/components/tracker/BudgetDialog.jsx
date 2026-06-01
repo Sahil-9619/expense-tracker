@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -36,7 +36,7 @@ export default function BudgetDialog({ isOpen, onOpenChange, onAdd }) {
               <Target size={20} strokeWidth={3} />
             </div>
             <div className="text-left">
-              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Initialize Limit</DialogTitle>
+              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Create Budget</DialogTitle>
               <DialogDescription className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em]">Protocol Layer: Threshold Control</DialogDescription>
             </div>
           </div>
@@ -45,7 +45,7 @@ export default function BudgetDialog({ isOpen, onOpenChange, onAdd }) {
         <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Category Hub</Label>
+              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Category</Label>
               <div className="relative">
                 <Target className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40" />
                 <Input 
@@ -60,7 +60,7 @@ export default function BudgetDialog({ isOpen, onOpenChange, onAdd }) {
             <div className="space-y-2">
               <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Containment Magnitude</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">â‚¹</span>
                 <Input 
                   type="number"
                   value={formData.limit}
@@ -88,3 +88,5 @@ export default function BudgetDialog({ isOpen, onOpenChange, onAdd }) {
     </Dialog>
   );
 }
+
+

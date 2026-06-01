@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,7 @@ export default function GoalDialog({ isOpen, onOpenChange, onAdd }) {
               <Trophy size={20} strokeWidth={3} />
             </div>
             <div className="text-left">
-              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Initialize Phase</DialogTitle>
+              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Create Goal</DialogTitle>
               <DialogDescription className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em]">Protocol Layer: Accumulation</DialogDescription>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function GoalDialog({ isOpen, onOpenChange, onAdd }) {
               <div className="space-y-2">
                 <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Capital Target</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">â‚¹</span>
                   <Input 
                     type="number"
                     value={formData.target}
@@ -98,3 +98,4 @@ export default function GoalDialog({ isOpen, onOpenChange, onAdd }) {
     </Dialog>
   );
 }
+

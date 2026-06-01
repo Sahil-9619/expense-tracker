@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,7 @@ export default function WalletDialog({ isOpen, onOpenChange, onAdd }) {
               <Landmark size={20} strokeWidth={3} />
             </div>
             <div className="text-left">
-              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Connect Node</DialogTitle>
+              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Add Wallet</DialogTitle>
               <DialogDescription className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em]">Protocol Layer: Liquidity</DialogDescription>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function WalletDialog({ isOpen, onOpenChange, onAdd }) {
             <div className="space-y-2">
               <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Initial Magnitude</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">â‚¹</span>
                 <Input 
                   type="number"
                   value={formData.balance}
@@ -112,3 +112,4 @@ export default function WalletDialog({ isOpen, onOpenChange, onAdd }) {
     </Dialog>
   );
 }
+

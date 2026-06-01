@@ -35,9 +35,9 @@ export const ThreeDMarquee = ({ images = [], className }) => {
             </div>
 
             {/* Premium Gradient Overlays for Depth and Focus */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg-color)] via-transparent to-[var(--bg-color)]" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[var(--bg-color)] via-transparent to-[var(--bg-color)]" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,var(--bg-color)_100%)] opacity-70 transform-gpu" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black via-transparent to-black" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)] opacity-70 transform-gpu" />
         </div>
     );
 };

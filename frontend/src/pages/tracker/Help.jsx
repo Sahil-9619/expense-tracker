@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,18 +8,18 @@ import { BRAND_NAME } from '../../lib/constants';
 
 export default function Help() {
   const commands = [
-    { cmd: 'help --start', desc: 'Initialize onboarding protocol' },
-    { cmd: 'audit --verify', desc: 'Check document integrity' },
-    { cmd: 'sync --all', desc: 'Force node synchronization' },
-    { cmd: 'identity --reset', desc: 'Recalibrate protocol profile' },
+    { cmd: 'help --start', desc: 'Get started with your account' },
+    { cmd: 'audit --verify', desc: 'Verify your documents' },
+    { cmd: 'sync --all', desc: 'Force data sync' },
+    { cmd: 'identity --reset', desc: 'Reset your profile settings' },
   ];
 
   return (
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div>
-          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Support Intelligence</h1>
-          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Master node operations and protocol master</p>
+          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Help & Support</h1>
+          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Get help with your account</p>
         </div>
         <div className="flex gap-2">
           <Button className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-sm px-4 shadow-lg shadow-emerald-500/20">
@@ -29,7 +29,7 @@ export default function Help() {
       </div>
 
       <div className="grid grid-cols-12 gap-4 flex-1">
-        {/* Terminal Knowledge Hub */}
+        {/* Help Center */}
         <Card className="col-span-12 lg:col-span-7 bg-[var(--bg-color)] border border-[var(--card-border)] rounded-sm overflow-hidden flex flex-col group shadow-2xl">
           <div className="p-3 bg-[var(--card-bg)] border-b border-[var(--card-border)] flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -44,15 +44,15 @@ export default function Help() {
                 <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">{BRAND_NAME}_Kernel_v2.0.4</span>
               </div>
             </div>
-            <span className="text-[8px] font-mono text-emerald-500/40">EST_SESSION_ID: AX-294</span>
+            <span className="text-[8px] font-mono text-emerald-500/40">SESSION_ID: AX-294</span>
           </div>
 
           <div className="flex-1 p-6 font-mono space-y-8 overflow-y-auto custom-scrollbar no-scrollbar">
             <div className="space-y-4">
               <div className="flex gap-4">
-                <span className="text-emerald-500 shrink-0">➜</span>
+                <span className="text-emerald-500 shrink-0">âžœ</span>
                 <p className="text-[11px] text-[var(--text-primary)] font-bold leading-relaxed">
-                  Welcome to the Intelligence Terminal. Query our knowledge nodes to optimize your financial protocols.
+                  Welcome to the Help Center. Search for answers or browse our guides to learn more.
                 </p>
               </div>
 
@@ -74,11 +74,11 @@ export default function Help() {
 
             <div className="space-y-6">
               <div className="flex gap-4">
-                <span className="text-emerald-500 shrink-0">➜</span>
+                <span className="text-emerald-500 shrink-0">âžœ</span>
                 <div className="flex-1 space-y-4">
-                  <span className="text-[11px] text-[var(--text-primary)] font-bold">Frequently Queried Protocols</span>
+                  <span className="text-[11px] text-[var(--text-primary)] font-bold">Frequently Asked Questions</span>
                   <div className="space-y-2">
-                    {['Automated Liquidity Syncing', 'Encrypted Document Hash Verification', 'Multi-Node Data Redundancy'].map(q => (
+                    {['Automated syncing', 'Document security', 'Data backup and safety'].map(q => (
                       <div key={q} className="flex items-center justify-between p-2 rounded-sm hover:bg-white/[0.03] transition-colors cursor-pointer group/link">
                         <span className="text-[10px] text-[var(--text-secondary)] group-hover/link:text-emerald-500 transition-colors">{q}</span>
                         <ChevronRight size={12} className="text-emerald-500 opacity-0 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all" />
@@ -93,19 +93,19 @@ export default function Help() {
           <div className="p-4 bg-[var(--bg-color)] border-t border-[var(--card-border)] relative">
             <Search className="absolute left-7 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-emerald-500" />
             <Input
-              placeholder="Enter command or search query..."
+              placeholder="Search for help..."
               className="bg-transparent border-none h-8 pl-10 text-[11px] font-mono text-emerald-500 placeholder:text-emerald-900 focus-visible:ring-0"
             />
           </div>
         </Card>
 
-        {/* Global Support Nodes */}
+        {/* Support Channels */}
         <div className="col-span-12 lg:col-span-5 space-y-4">
           <Card className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-sm p-6 space-y-6">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Hardware Support</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">System Support</h2>
             <div className="grid grid-cols-2 gap-4">
               <SupportNode icon={Cpu} label="System Core" desc="24/7 Operations" />
-              <SupportNode icon={Globe} label="Region Hubs" desc="Global Clusters" />
+              <SupportNode icon={Globe} label="Servers" desc="Global Clusters" />
             </div>
           </Card>
 
@@ -115,11 +115,11 @@ export default function Help() {
               <MessageCircle size={32} strokeWidth={2.5} />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-black text-white uppercase tracking-tighter">Human Intelligence</h3>
-              <p className="text-[10px] text-emerald-500/60 font-black uppercase tracking-[0.2em]">Priority encrypted communication</p>
+              <h3 className="text-lg font-black text-white uppercase tracking-tighter">Contact Support</h3>
+              <p className="text-[10px] text-emerald-500/60 font-black uppercase tracking-[0.2em]">Get help from a real person</p>
             </div>
             <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest h-10 rounded-sm mt-4">
-              Connect to Agent <Zap size={14} className="ml-2" />
+              Chat with Support <Zap size={14} className="ml-2" />
             </Button>
           </Card>
         </div>
@@ -141,3 +141,4 @@ function SupportNode({ icon: Icon, label, desc }) {
     </div>
   );
 }
+

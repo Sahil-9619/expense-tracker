@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, 
@@ -174,7 +174,7 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
                     {user?.name || 'Authorized User'}
                   </span>
                   <span className="text-[8px] text-emerald-500 font-bold truncate opacity-80 uppercase tracking-[0.2em]">
-                    PRO ACCESS
+                    PRO MEMBER
                   </span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
               >
                 <div className="flex items-center gap-2.5">
                   <LogOut size={14} strokeWidth={3} />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Logout Session</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest">Logout</span>
                 </div>
                 <ChevronRight size={12} className="opacity-40 group-hover:translate-x-0.5 transition-transform" />
               </button>
@@ -208,3 +208,4 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
     </>
   );
 }
+

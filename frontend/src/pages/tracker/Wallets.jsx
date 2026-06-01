@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Wallet, CreditCard, Landmark, ShieldCheck, Activity } from 'lucide-react';
@@ -35,11 +35,11 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-end justify-between px-2">
         <div>
-          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Liquidity Nodes</h1>
-          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Distributed capital architecture</p>
+          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Wallets</h1>
+          <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Manage your accounts and balances</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest h-8 px-4">
-          <Plus className="mr-2 h-3 w-3" /> Connect Node
+          <Plus className="mr-2 h-3 w-3" /> Add Wallet
         </Button>
       </div>
 
@@ -47,7 +47,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
         <div className="lg:col-span-4 space-y-2">
           {wallets.length === 0 ? (
             <div className="p-6 rounded-sm border border-dashed border-[var(--card-border)] text-center text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-50">
-              No liquidity nodes connected
+              No wallets connected
             </div>
           ) : wallets.map((wallet) => {
             const Icon = walletIconByType[wallet.type] || Wallet;
@@ -73,7 +73,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-black font-mono text-[var(--text-primary)]">
-                    ₹{Math.abs(Number(wallet.balance || 0)).toLocaleString()}
+                    â‚¹{Math.abs(Number(wallet.balance || 0)).toLocaleString()}
                   </div>
                 </div>
               </motion.div>
@@ -81,7 +81,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
           })}
 
           <button onClick={() => setIsModalOpen(true)} className="w-full py-4 border border-dashed border-[var(--card-border)] rounded-sm flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-emerald-500/5 transition-all">
-            <Plus size={12} /> Add Terminal
+            <Plus size={12} /> Add Wallet
           </button>
         </div>
 
@@ -95,26 +95,26 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                       {activeWallet?.status || 'Inactive'}
                     </div>
                     <h2 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter">{activeWallet?.name || 'No Wallet Selected'}</h2>
-                    <p className="text-[10px] font-medium text-[var(--text-secondary)] opacity-60">Verified Liquidity Node: {activeWallet ? `#${activeWallet.id}` : 'Not connected'}</p>
+                    <p className="text-[10px] font-medium text-[var(--text-secondary)] opacity-60">Wallet ID: {activeWallet ? `#${activeWallet.id}` : 'Not connected'}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Current Balance</span>
-                    <span className="text-3xl font-black font-mono tracking-tighter text-emerald-500">₹{Number(activeWallet?.balance || 0).toLocaleString()}</span>
+                    <span className="text-3xl font-black font-mono tracking-tighter text-emerald-500">â‚¹{Number(activeWallet?.balance || 0).toLocaleString()}</span>
                   </div>
                 </div>
 
                 <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-4">
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Node Analytics</h3>
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Wallet Analytics</h3>
                     <div className="space-y-3">
-                      <IntelligenceItem label="Total Inflow" value={`₹${totalInflow.toLocaleString()}`} trend={`${activeTransactions.length} records`} isUp />
-                      <IntelligenceItem label="Total Outflow" value={`₹${totalOutflow.toLocaleString()}`} trend="Tracked" />
-                      <IntelligenceItem label="Node Stability" value={activeWallet?.status || 'Inactive'} trend="DB synced" isUp />
+                      <IntelligenceItem label="Total Inflow" value={`â‚¹${totalInflow.toLocaleString()}`} trend={`${activeTransactions.length} records`} isUp />
+                      <IntelligenceItem label="Total Outflow" value={`â‚¹${totalOutflow.toLocaleString()}`} trend="Tracked" />
+                      <IntelligenceItem label="Wallet Status" value={activeWallet?.status || 'Inactive'} trend="DB synced" isUp />
                     </div>
                   </div>
 
                   <div className="md:col-span-2 space-y-4">
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Recent Node Activity</h3>
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Recent Wallet Activity</h3>
                     <div className="space-y-2">
                       {activeTransactions.length === 0 ? (
                         <div className="p-4 rounded-sm bg-[var(--bg-color)]/50 border border-[var(--card-border)] text-center text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40">
@@ -132,7 +132,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                             </div>
                           </div>
                           <span className={`text-[10px] font-black font-mono ${tx.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {tx.type === 'income' ? '+' : '-'}₹{Number(tx.amount || 0).toLocaleString()}
+                            {tx.type === 'income' ? '+' : '-'}â‚¹{Number(tx.amount || 0).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -143,9 +143,9 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                 <div className="mt-auto p-6 bg-emerald-500/5 border-t border-[var(--card-border)] flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="text-emerald-500" size={18} />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">User-scoped database sync active</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">All data is saved and synced securely</span>
                   </div>
-                  <Button className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest px-4">Sync Protocol</Button>
+                  <Button className="h-8 bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm text-[9px] font-black uppercase tracking-widest px-4">Sync Now</Button>
                 </div>
               </Card>
             </motion.div>
@@ -169,3 +169,4 @@ function IntelligenceItem({ label, value, trend, isUp = false }) {
     </div>
   );
 }
+

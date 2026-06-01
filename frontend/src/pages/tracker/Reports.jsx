@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, ArrowRight, BarChart3, PieChart as PieChartIcon, Folder, ShieldCheck, Search, Filter, Plus } from 'lucide-react';
@@ -23,7 +23,7 @@ export default function Reports({ folders = [], reports = [], onCreateReport }) 
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 h-full flex flex-col">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
         <div>
-          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Intelligence Archive</h1>
+          <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Reports</h1>
           <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Database-backed financial audits</p>
         </div>
         <div className="flex gap-2">
@@ -126,3 +126,4 @@ export default function Reports({ folders = [], reports = [], onCreateReport }) 
     </div>
   );
 }
+

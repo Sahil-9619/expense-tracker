@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import {
   MoreVertical,
   TrendingUp,
@@ -64,7 +64,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
         <div className="flex items-end justify-between px-2">
           <div>
             <h1 className="text-lg font-black tracking-tight text-[var(--text-primary)] uppercase">Financial Overview</h1>
-            <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Real-time liquidity monitoring</p>
+            <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Real-time financial overview</p>
           </div>
           <div className="flex gap-2">
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] hover:bg-[var(--bg-color)] transition-all">
@@ -82,7 +82,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-12 gap-3">
 
-          {/* --- ROW 1: Micro KPIs --- */}
+          {/* --- ROW 1: Key Metrics --- */}
           <KPICard
             title="Total Net Worth"
             value={balance}
@@ -103,7 +103,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
               <button className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-secondary)]"><MoreVertical size={12} /></button>
             </div>
             <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">
-              ₹{totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              â‚¹{totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             {/* Micro Sparkline */}
             <div className="h-6 mt-auto pt-2 w-full flex items-end gap-[2px]">
@@ -155,17 +155,17 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
           {/* Quick Transfer Panel */}
           <div className={`${cardBase} col-span-12 lg:col-span-4 min-h-[220px] flex flex-col`}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Protocol Bridge</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Quick Transfer</h2>
             </div>
 
             <div className="p-3 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/40 flex flex-col gap-2 mb-2">
-              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">From Liquidity Node</span>
+              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">From Wallet</span>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><Wallet size={12} /></div>
                   <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{primaryWallet?.name || 'No Wallet Connected'}</span>
                 </div>
-                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">₹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
+                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">â‚¹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
               </div>
             </div>
 
@@ -176,7 +176,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
             </div>
 
             <div className="p-3 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/40 flex flex-col gap-2 mt-2">
-              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">To Capital Hub</span>
+              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">To Goal</span>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded bg-indigo-500/20 text-indigo-500 flex items-center justify-center"><PieChart size={12} /></div>
@@ -188,7 +188,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
 
             <div className="mt-auto flex gap-2 pt-4">
               <div className="flex-1 flex items-center px-3 py-1.5 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/20">
-                <span className="text-[var(--text-secondary)] text-xs">₹</span>
+                <span className="text-[var(--text-secondary)] text-xs">â‚¹</span>
                 <input type="text" placeholder="0.00" className="bg-transparent border-none outline-none w-full text-xs font-mono ml-1 placeholder-[var(--text-secondary)] text-[var(--text-primary)]" />
               </div>
               <button className="px-4 py-1.5 bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] rounded-sm hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/10">
@@ -200,9 +200,9 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
           {/* --- ROW 3: Dense Transaction Table --- */}
           <div className={`${cardBase} col-span-12 lg:col-span-8`}>
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Recent Ledger Entries</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Recent Transactions</h2>
               <button className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-emerald-500 transition-all">
-                <Filter size={10} /> Filter Protocols
+                <Filter size={10} /> Filter
               </button>
             </div>
 
@@ -219,7 +219,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                 <tbody className="text-[10px]">
                   {sortedTransactions.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="py-10 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-40">Awaiting system input...</td>
+                      <td colSpan="4" className="py-10 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-40">No transactions found.</td>
                     </tr>
                   ) : (
                     sortedTransactions.map((tx) => {
@@ -238,7 +238,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                             </span>
                           </td>
                           <td className={`py-2.5 text-right font-mono font-black tracking-tighter ${tx.type === 'income' ? 'text-emerald-500' : 'text-[var(--text-primary)]'}`}>
-                            {tx.type === 'income' ? '+' : ''}₹{parseFloat(tx.amount).toLocaleString()}
+                            {tx.type === 'income' ? '+' : ''}â‚¹{parseFloat(tx.amount).toLocaleString()}
                           </td>
                           <td className="py-2.5 text-center">
                             <div className={`w-1.5 h-1.5 rounded-full mx-auto ${tx.type === 'income' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-500'}`}></div>
@@ -259,7 +259,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
             <div className="flex flex-col gap-5">
               {assetDistribution.length === 0 ? (
                 <div className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40 text-center py-6">
-                  No wallet or goal assets stored
+                  No wallets or goals found
                 </div>
               ) : assetDistribution.map((asset, i) => {
                 const value = assetTotal ? (Math.abs(asset.amount) / assetTotal) * 100 : 0;
@@ -272,7 +272,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                     </div>
                     <div className="flex gap-2 items-center">
                       <span className="text-[var(--text-secondary)] font-bold opacity-40">{value.toFixed(1)}%</span>
-                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">₹{asset.amount.toLocaleString()}</span>
+                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">â‚¹{asset.amount.toLocaleString()}</span>
                     </div>
                   </div>
                   <div className="w-full h-1 bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
@@ -297,12 +297,13 @@ function KPICard({ title, value, trend, isUp, cardBase }) {
         <button className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-secondary)]"><MoreVertical size={12} /></button>
       </div>
       <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">
-        ₹{Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        â‚¹{Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}
       </div>
       <div className="flex items-center gap-1 mt-auto pt-3">
         {isUp ? <TrendingUp size={12} className="text-emerald-500" /> : <TrendingDown size={12} className="text-rose-500" />}
-        <span className={`text-[9px] font-black uppercase tracking-widest ${isUp ? 'text-emerald-500' : 'text-rose-500'}`}>{trend} vs last epoch</span>
+        <span className={`text-[9px] font-black uppercase tracking-widest ${isUp ? 'text-emerald-500' : 'text-rose-500'}`}>{trend} vs last month</span>
       </div>
     </div>
   );
 }
+
