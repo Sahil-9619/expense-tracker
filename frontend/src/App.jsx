@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Auth from './pages/auth/Auth';
 import Tracker from './pages/tracker/Tracker';
-import { Toaster } from './components/ui/sonner';
+import { CustomToaster } from './components/UI/CustomToaster';
 import { useAuth } from './context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -39,7 +39,7 @@ const App = () => {
                     } 
                 />
             </Routes>
-            <Toaster position="top-right" />
+            <CustomToaster />
         </div>
     );
 };

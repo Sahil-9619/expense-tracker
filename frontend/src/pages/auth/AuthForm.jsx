@@ -8,7 +8,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
-import { toast } from "sonner";
+import { toast } from "../../components/UI/CustomToaster";
 import { useTheme } from "../../context/ThemeContext";
 
 export const AuthForm = ({ onLogin, onTypeChange }) => {

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from '../UI/CustomToaster';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Zap, Wallet, Tag, Calendar } from 'lucide-react';
 
-export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categoryConfig, wallets = [] }) {
+export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categoryConfig, wallets = [], transactionToEdit }) {
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
@@ -22,11 +23,40 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
     date: new Date().toISOString().split('T')[0]
   });
 
+  useEffect(() => {
+    if (transactionToEdit) {
+      setFormData({
+        description: transactionToEdit.title || transactionToEdit.description || '',
+        amount: transactionToEdit.amount || '',
+        category: transactionToEdit.category || 'Food',
+        type: transactionToEdit.type || 'expense',
+        payment_mode: transactionToEdit.payment_mode || 'Cash',
+        date: transactionToEdit.date || new Date().toISOString().split('T')[0]
+      });
+    } else {
+      setFormData({
+        description: '',
+        amount: '',
+        category: 'Food',
+        type: 'expense',
+        payment_mode: 'Cash',
+        date: new Date().toISOString().split('T')[0]
+      });
+    }
+  }, [transactionToEdit, isOpen]);
+
   const categories = Object.keys(categoryConfig);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.description || !formData.amount) return;
+    if (!formData.description.trim()) {
+      toast.error("Please enter a description");
+      return;
+    }
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
     onAdd({ ...formData });
     onOpenChange(false);
     setFormData({
@@ -50,7 +80,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
               <Plus size={20} strokeWidth={3} />
             </div>
             <div className="text-left">
-              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">Initialize Entry</DialogTitle>
+              <DialogTitle className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">{transactionToEdit ? "Modify Entry" : "Initialize Entry"}</DialogTitle>
               <DialogDescription className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em]">Protocol Layer: Transaction</DialogDescription>
             </div>
           </div>
@@ -173,7 +203,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
             type="submit"
             className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-emerald-500/20 group transition-all"
           >
-            Execute Protocol <Zap size={14} className="ml-2 group-hover:animate-pulse" />
+            {transactionToEdit ? "Update Transaction" : "Execute Protocol"} <Zap size={14} className="ml-2 group-hover:animate-pulse" />
           </Button>
         </form>
       </DialogContent>

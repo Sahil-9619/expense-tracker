@@ -1,7 +1,9 @@
 import apiService from './api.service';
 
-export const getExpenses = async () => {
-    return apiService('/expenses/');
+export const getExpenses = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = `/expenses/${query ? `?${query}` : ''}`;
+    return apiService(url);
 };
 
 export const createExpense = async (data) => {

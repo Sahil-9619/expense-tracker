@@ -10,7 +10,7 @@ import {
   ShieldCheck, Smartphone, Key, LogOut,
   AlertTriangle, ArrowUpRight
 } from 'lucide-react';
-import { toast } from "sonner";
+import { toast } from '../../components/UI/CustomToaster';
 import { setUser as setReduxUser } from '../../redux/slices/authSlice';
 import { updateUserProfile } from '../../services/user.service';
 import { motion } from 'motion/react';

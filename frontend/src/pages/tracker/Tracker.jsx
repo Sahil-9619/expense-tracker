@@ -21,7 +21,7 @@ import {
   getReports
 } from '../../services/tracker.service';
 import { useAuth } from '../../context/AuthContext';
-import { toast } from 'sonner';
+import { toast } from '../../components/UI/CustomToaster';
 import { 
   ShoppingBag, Utensils, Car, Heart, 
   Gamepad2, Lightbulb, User, MoreHorizontal,
@@ -79,6 +79,7 @@ export default function Tracker() {
   const [reports, setReports] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [txRefreshTrigger, setTxRefreshTrigger] = useState(0);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -131,6 +132,7 @@ export default function Tracker() {
       });
       toast.success('Transaction Synchronized Successfully');
       fetchTrackerData();
+      setTxRefreshTrigger(prev => prev + 1);
     } catch (err) {
       toast.error(err.message || 'Protocol Synchronization Failed');
     }
@@ -200,8 +202,9 @@ export default function Tracker() {
             } />
             <Route path="transactions" element={
               <Transactions 
-                transactions={transactions} 
+                categoryConfig={categoryConfig}
                 onAddClick={() => setIsTxModalOpen(true)}
+                refreshTrigger={txRefreshTrigger}
               />
             } />
             <Route path="analytics" element={

@@ -36,8 +36,7 @@ expense_request_body = openapi.Schema(
     method='post',
     operation_summary="Create a new expense",
     request_body=expense_request_body,
-    responses={201: ExpenseSerializer}
-)
+    responses={201: ExpenseSerializer})
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def expense_list(request):
@@ -45,7 +44,51 @@ def expense_list(request):
 
     # GET (only user’s expenses)
     if request.method == 'GET':
-        expenses = get_all_expenses().filter(user=user).order_by('-date', '-created_at')
+        from django.db.models import Q
+        from rest_framework.pagination import PageNumberPagination
+        
+        expenses = get_all_expenses().filter(user=user)
+        
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            expenses = expenses.filter(
+                Q(title__icontains=search_query) | 
+                Q(description__icontains=search_query) | 
+                Q(category__icontains=search_query)
+            )
+            
+        # Quick Filters
+        type_filter = request.query_params.get('type', '')
+        if type_filter in ['income', 'expense']:
+            expenses = expenses.filter(type=type_filter)
+            
+        min_amount = request.query_params.get('min_amount', '')
+        if min_amount:
+            try:
+                expenses = expenses.filter(amount__gte=float(min_amount))
+            except ValueError:
+                pass
+            
+        expenses = expenses.order_by('-date', '-created_at')
+        
+        page_param = request.query_params.get('page', None)
+        search_param = request.query_params.get('search', None)
+        type_param = request.query_params.get('type', None)
+        min_amt_param = request.query_params.get('min_amount', None)
+        
+        if (page_param is not None or 
+            search_param is not None or 
+            type_param is not None or 
+            min_amt_param is not None or 
+            request.query_params.get('paginate') == 'true'):
+            
+            paginator = PageNumberPagination()
+            paginator.page_size = 10
+            page = paginator.paginate_queryset(expenses, request)
+            if page is not None:
+                serializer = ExpenseListSerializer(page, many=True)
+                return paginator.get_paginated_response(serializer.data)
+        
         serializer = ExpenseListSerializer(expenses, many=True)
         return Response(serializer.data)
 

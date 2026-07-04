@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -20,17 +20,111 @@ import {
   MoreHorizontal,
   History,
   Calendar,
-  Settings2
+  Settings2,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { motion } from 'motion/react';
+import { getExpenses, deleteExpense, updateExpense } from '../../services/expense.service';
+import { toast } from '../../components/UI/CustomToaster';
+import TransactionDialog from '../../components/tracker/TransactionDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
-export default function Transactions({ transactions = [], onAddClick }) {
+export default function Transactions({ categoryConfig = {}, onAddClick, refreshTrigger }) {
+  const [transactions, setTransactions] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [deletingTransactionId, setDeletingTransactionId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteClick = (id) => {
+    setDeletingTransactionId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTransactionId) return;
+    try {
+      await deleteExpense(deletingTransactionId);
+      toast.success("Transaction Deleted Successfully");
+      setIsDeleteModalOpen(false);
+      setDeletingTransactionId(null);
+      fetchTransactions(currentPage, search, activeFilter);
+    } catch (err) {
+      toast.error(err.message || "Failed to delete transaction");
+    }
+  };
+
+  const handleEditClick = (tx) => {
+    setEditingTransaction(tx);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTransaction = async (updatedData) => {
+    try {
+      await updateExpense(editingTransaction.id, {
+        ...updatedData,
+        title: updatedData.description
+      });
+      toast.success("Transaction Updated Successfully");
+      fetchTransactions(currentPage, search, activeFilter);
+    } catch (err) {
+      toast.error(err.message || "Failed to update transaction");
+    }
+  };
+
+  const fetchTransactions = useCallback(async (page, searchTerm, filter) => {
+    setIsLoading(true);
+    try {
+      const params = { page, search: searchTerm, paginate: true };
+      if (filter === 'income') {
+        params.type = 'income';
+      } else if (filter === 'expense') {
+        params.type = 'expense';
+      } else if (filter === 'high') {
+        params.min_amount = '5000';
+      }
+
+      const response = await getExpenses(params);
+      if (response) {
+        setTransactions(response.results || []);
+        setTotalCount(response.count || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch transactions:", err);
+      toast.error("Failed to load transactions");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const handleExportCSV = () => {
     if (!transactions.length) return;
+
+    const formatDateForCSV = (dateStr) => {
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const day = String(d.getDate()).padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = months[d.getMonth()];
+        const year = d.getFullYear();
+        return `${day} ${month} ${year}`;
+      } catch {
+        return dateStr;
+      }
+    };
+
     const headers = ["Date", "Description", "Category", "Type", "Amount"];
     const rows = transactions.map(tx => [
-      tx.date,
+      formatDateForCSV(tx.date),
       tx.merchant || tx.description || '',
       tx.category || '',
       tx.type || '',
@@ -51,6 +145,20 @@ export default function Transactions({ transactions = [], onAddClick }) {
     link.click();
     document.body.removeChild(link);
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, activeFilter]);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchTransactions(currentPage, search, activeFilter);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, search, activeFilter, fetchTransactions, refreshTrigger]);
+
+  const totalPages = Math.ceil(totalCount / 10) || 1;
 
   return (
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -86,6 +194,8 @@ export default function Transactions({ transactions = [], onAddClick }) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--text-secondary)] opacity-40" />
                 <Input 
                   placeholder="Search transactions..." 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="pl-9 h-9 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-[10px] font-bold placeholder:opacity-30"
                 />
               </div>
@@ -94,10 +204,26 @@ export default function Transactions({ transactions = [], onAddClick }) {
             <div className="space-y-4">
               <label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Quick Filters</label>
               <div className="flex flex-col gap-2">
-                <FilterButton label="High Amount" active={true} />
-                <FilterButton label="Income Only" />
-                <FilterButton label="Expenses Only" />
-                <FilterButton label="Pending" />
+                <FilterButton 
+                  label="All Ledger" 
+                  active={activeFilter === 'all'} 
+                  onClick={() => setActiveFilter('all')}
+                />
+                <FilterButton 
+                  label="High Amount" 
+                  active={activeFilter === 'high'} 
+                  onClick={() => setActiveFilter('high')}
+                />
+                <FilterButton 
+                  label="Income Only" 
+                  active={activeFilter === 'income'} 
+                  onClick={() => setActiveFilter('income')}
+                />
+                <FilterButton 
+                  label="Expenses Only" 
+                  active={activeFilter === 'expense'} 
+                  onClick={() => setActiveFilter('expense')}
+                />
               </div>
             </div>
 
@@ -133,7 +259,13 @@ export default function Transactions({ transactions = [], onAddClick }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.length === 0 ? (
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-32 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-40">
+                        Synchronizing Ledger...
+                      </TableCell>
+                    </TableRow>
+                  ) : transactions.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="h-32 text-center text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-20">
                         No transactions found
@@ -178,9 +310,22 @@ export default function Transactions({ transactions = [], onAddClick }) {
                           </div>
                         </TableCell>
                         <TableCell className="px-6">
-                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-emerald-500/10">
-                              <MoreHorizontal size={14} />
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button 
+                              onClick={(e) => { e.stopPropagation(); handleEditClick(tx); }}
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-emerald-500/10 cursor-pointer"
+                            >
+                              <Pencil size={12} />
+                            </Button>
+                            <Button 
+                              onClick={(e) => { e.stopPropagation(); handleDeleteClick(tx.id); }}
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer"
+                            >
+                              <Trash2 size={12} />
                             </Button>
                           </div>
                         </TableCell>
@@ -193,28 +338,103 @@ export default function Transactions({ transactions = [], onAddClick }) {
             
             <div className="p-4 border-t border-[var(--card-border)] bg-[var(--bg-color)]/30 flex items-center justify-between">
               <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-50">
-                Sync complete. {transactions.length} transactions found.
+                Page {currentPage} of {totalPages} ({totalCount} transactions found)
               </span>
-              <div className="flex gap-1">
-                <Button variant="outline" className="h-7 text-[8px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)]">Prior</Button>
-                <Button variant="outline" className="h-7 text-[8px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Following</Button>
+              <div className="flex items-center gap-1.5">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-7 text-[8px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] bg-[var(--bg-color)]/50 hover:bg-emerald-500/10 hover:text-emerald-500 disabled:opacity-40 disabled:hover:bg-transparent"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1 || isLoading}
+                >
+                  Previous
+                </Button>
+                
+                {Array.from({ length: totalPages }, (_, idx) => idx + 1).map(pageNumber => (
+                  <Button
+                    key={pageNumber}
+                    variant={pageNumber === currentPage ? "default" : "outline"}
+                    className={`h-7 w-7 text-[8px] font-black rounded-sm ${pageNumber === currentPage ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-transparent' : 'border-[var(--card-border)] bg-[var(--bg-color)]/50 hover:bg-emerald-500/10 hover:text-emerald-500'}`}
+                    onClick={() => setCurrentPage(pageNumber)}
+                    disabled={isLoading}
+                  >
+                    {pageNumber}
+                  </Button>
+                ))}
+
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-7 text-[8px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] bg-[var(--bg-color)]/50 hover:bg-emerald-500/10 hover:text-emerald-500 disabled:opacity-40 disabled:hover:bg-transparent"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages || isLoading}
+                >
+                  Next
+                </Button>
               </div>
             </div>
           </Card>
         </div>
       </div>
+      
+      <TransactionDialog 
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        onAdd={handleUpdateTransaction}
+        categoryConfig={categoryConfig}
+        transactionToEdit={editingTransaction}
+      />
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="bg-[var(--bg-color)] border-[var(--card-border)] sm:max-w-[380px] rounded-sm p-6 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-rose-600 shadow-[0_0_15px_rgba(244,63,94,1)]" />
+          
+          <DialogHeader className="pt-2 text-left">
+            <DialogTitle className="text-sm font-black text-[var(--text-primary)] uppercase tracking-tight">Confirm Deletion</DialogTitle>
+            <DialogDescription className="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mt-1">
+              Warning: Destructive operation ahead
+            </DialogDescription>
+          </DialogHeader>
+
+          <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide py-4">
+            Are you sure you want to permanently delete this transaction from the ledger? This action cannot be undone.
+          </p>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-[var(--card-border)]/50">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="h-9 px-4 border-[var(--card-border)] bg-transparent text-[var(--text-primary)] font-black uppercase text-[9px] tracking-widest rounded-sm cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button"
+              onClick={handleConfirmDelete}
+              className="h-9 px-4 bg-rose-600 hover:bg-rose-500 text-white font-black uppercase text-[9px] tracking-widest rounded-sm shadow-lg shadow-rose-500/20 cursor-pointer"
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function FilterButton({ label, active = false }) {
+function FilterButton({ label, active = false, onClick }) {
   return (
-    <button className={`
-      flex items-center justify-between px-3 py-2 rounded-sm text-[9px] font-black uppercase tracking-widest transition-all
-      ${active 
-        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-        : 'text-[var(--text-secondary)] hover:bg-emerald-500/5 hover:text-[var(--text-primary)] border border-transparent'}
-    `}>
+    <button 
+      onClick={onClick}
+      className={`
+        flex items-center justify-between px-3 py-2 rounded-sm text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer w-full text-left
+        ${active 
+          ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+          : 'text-[var(--text-secondary)] hover:bg-emerald-500/5 hover:text-[var(--text-primary)] border border-transparent'}
+      `}
+    >
       {label}
       {active && <div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]" />}
     </button>
