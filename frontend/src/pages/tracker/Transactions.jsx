@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   Table, 
   TableBody, 
@@ -142,7 +142,7 @@ export default function Transactions({ transactions = [], onAddClick }) {
                         <TableCell className="text-right px-6">
                           <div className="flex flex-col items-end">
                             <span className={`text-[11px] font-black font-mono tracking-tighter ${tx.type === 'income' ? 'text-emerald-500' : 'text-[var(--text-primary)]'}`}>
-                              {tx.type === 'income' ? '+' : '-'}â‚¹{parseFloat(tx.amount).toLocaleString()}
+                              {tx.type === 'income' ? '+' : '-'}₹{parseFloat(tx.amount).toLocaleString()}
                             </span>
                             <span className="text-[8px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Confirmed</span>
                           </div>

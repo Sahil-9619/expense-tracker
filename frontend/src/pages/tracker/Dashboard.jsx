@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   MoreVertical,
   TrendingUp,
@@ -103,7 +103,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
               <button className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-secondary)]"><MoreVertical size={12} /></button>
             </div>
             <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">
-              â‚¹{totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ₹{totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             {/* Micro Sparkline */}
             <div className="h-6 mt-auto pt-2 w-full flex items-end gap-[2px]">
@@ -165,7 +165,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                   <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><Wallet size={12} /></div>
                   <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{primaryWallet?.name || 'No Wallet Connected'}</span>
                 </div>
-                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">â‚¹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
+                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">₹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
               </div>
             </div>
 
@@ -188,7 +188,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
 
             <div className="mt-auto flex gap-2 pt-4">
               <div className="flex-1 flex items-center px-3 py-1.5 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/20">
-                <span className="text-[var(--text-secondary)] text-xs">â‚¹</span>
+                <span className="text-[var(--text-secondary)] text-xs">₹</span>
                 <input type="text" placeholder="0.00" className="bg-transparent border-none outline-none w-full text-xs font-mono ml-1 placeholder-[var(--text-secondary)] text-[var(--text-primary)]" />
               </div>
               <button className="px-4 py-1.5 bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] rounded-sm hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/10">
@@ -238,7 +238,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                             </span>
                           </td>
                           <td className={`py-2.5 text-right font-mono font-black tracking-tighter ${tx.type === 'income' ? 'text-emerald-500' : 'text-[var(--text-primary)]'}`}>
-                            {tx.type === 'income' ? '+' : ''}â‚¹{parseFloat(tx.amount).toLocaleString()}
+                            {tx.type === 'income' ? '+' : ''}₹{parseFloat(tx.amount).toLocaleString()}
                           </td>
                           <td className="py-2.5 text-center">
                             <div className={`w-1.5 h-1.5 rounded-full mx-auto ${tx.type === 'income' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-500'}`}></div>
@@ -272,7 +272,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
                     </div>
                     <div className="flex gap-2 items-center">
                       <span className="text-[var(--text-secondary)] font-bold opacity-40">{value.toFixed(1)}%</span>
-                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">â‚¹{asset.amount.toLocaleString()}</span>
+                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">₹{asset.amount.toLocaleString()}</span>
                     </div>
                   </div>
                   <div className="w-full h-1 bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
@@ -297,7 +297,7 @@ function KPICard({ title, value, trend, isUp, cardBase }) {
         <button className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-secondary)]"><MoreVertical size={12} /></button>
       </div>
       <div className="text-xl font-black font-mono tracking-tighter text-[var(--text-primary)]">
-        â‚¹{Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        ₹{Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}
       </div>
       <div className="flex items-center gap-1 mt-auto pt-3">
         {isUp ? <TrendingUp size={12} className="text-emerald-500" /> : <TrendingDown size={12} className="text-rose-500" />}

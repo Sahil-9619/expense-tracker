@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Target, Trophy, Clock, Plus, Flag, ShieldCheck } from 'lucide-react';
@@ -85,8 +85,8 @@ export default function Goals({ goals = [], onAddGoal }) {
 
                     <div className="col-span-12 md:col-span-3 text-right">
                       <div className="flex flex-col">
-                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">â‚¹{current.toLocaleString()}</span>
-                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: â‚¹{target.toLocaleString()}</span>
+                        <span className="text-lg font-black font-mono tracking-tighter text-[var(--text-primary)]">₹{current.toLocaleString()}</span>
+                        <span className="text-[9px] font-bold text-[var(--text-secondary)] opacity-40 uppercase tracking-widest">Target: ₹{target.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>

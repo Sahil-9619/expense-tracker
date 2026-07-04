@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -77,7 +77,7 @@ export default function Budgets({ budgets = [], transactions = [], onAddBudget }
                 <Zap size={16} className="text-emerald-500" />
               </div>
               <div>
-                <span className="text-xl font-black font-mono text-[var(--text-primary)]">â‚¹{savedAmount.toLocaleString()}</span>
+                <span className="text-xl font-black font-mono text-[var(--text-primary)]">₹{savedAmount.toLocaleString()}</span>
                 <p className="text-[8px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Total money saved</p>
               </div>
             </div>
@@ -111,8 +111,8 @@ export default function Budgets({ budgets = [], transactions = [], onAddBudget }
                         <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-tight group-hover:text-emerald-500 transition-colors">{budget.category}</h3>
                       </div>
                       <div className="text-right">
-                        <span className={`text-sm font-black font-mono tracking-tighter ${isOver ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>â‚¹{budget.spent.toLocaleString()}</span>
-                        <span className="text-[8px] font-bold text-[var(--text-secondary)] opacity-30 ml-1">/ â‚¹{budget.limit.toLocaleString()}</span>
+                        <span className={`text-sm font-black font-mono tracking-tighter ${isOver ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>₹{budget.spent.toLocaleString()}</span>
+                        <span className="text-[8px] font-bold text-[var(--text-secondary)] opacity-30 ml-1">/ ₹{budget.limit.toLocaleString()}</span>
                       </div>
                     </div>
 
@@ -147,7 +147,7 @@ function AlertItem({ category, overAmount, percentage, isWarning = false }) {
     <div className={`flex items-center justify-between p-3 rounded-sm border ${isWarning ? 'bg-amber-500/5 border-amber-500/20' : 'bg-rose-500/10 border-rose-500/20'}`}>
       <div className="flex flex-col">
         <span className={`text-[9px] font-black uppercase tracking-tight ${isWarning ? 'text-amber-500' : 'text-rose-500'}`}>{category}</span>
-        <span className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{isWarning ? 'Approaching Limit' : `+â‚¹${overAmount} Over Limit`}</span>
+        <span className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{isWarning ? 'Approaching Limit' : `+₹${overAmount} Over Limit`}</span>
       </div>
       <span className={`text-[10px] font-black font-mono ${isWarning ? 'text-amber-500' : 'text-rose-500'}`}>{percentage}</span>
     </div>

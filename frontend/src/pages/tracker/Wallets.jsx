@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Wallet, CreditCard, Landmark, ShieldCheck, Activity } from 'lucide-react';
@@ -73,7 +73,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-black font-mono text-[var(--text-primary)]">
-                    â‚¹{Math.abs(Number(wallet.balance || 0)).toLocaleString()}
+                    ₹{Math.abs(Number(wallet.balance || 0)).toLocaleString()}
                   </div>
                 </div>
               </motion.div>
@@ -99,7 +99,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Current Balance</span>
-                    <span className="text-3xl font-black font-mono tracking-tighter text-emerald-500">â‚¹{Number(activeWallet?.balance || 0).toLocaleString()}</span>
+                    <span className="text-3xl font-black font-mono tracking-tighter text-emerald-500">₹{Number(activeWallet?.balance || 0).toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -107,8 +107,8 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                   <div className="space-y-4">
                     <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Wallet Analytics</h3>
                     <div className="space-y-3">
-                      <IntelligenceItem label="Total Inflow" value={`â‚¹${totalInflow.toLocaleString()}`} trend={`${activeTransactions.length} records`} isUp />
-                      <IntelligenceItem label="Total Outflow" value={`â‚¹${totalOutflow.toLocaleString()}`} trend="Tracked" />
+                      <IntelligenceItem label="Total Inflow" value={`₹${totalInflow.toLocaleString()}`} trend={`${activeTransactions.length} records`} isUp />
+                      <IntelligenceItem label="Total Outflow" value={`₹${totalOutflow.toLocaleString()}`} trend="Tracked" />
                       <IntelligenceItem label="Wallet Status" value={activeWallet?.status || 'Inactive'} trend="DB synced" isUp />
                     </div>
                   </div>
@@ -132,7 +132,7 @@ export default function Wallets({ wallets = [], transactions = [], onAddWallet }
                             </div>
                           </div>
                           <span className={`text-[10px] font-black font-mono ${tx.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {tx.type === 'income' ? '+' : '-'}â‚¹{Number(tx.amount || 0).toLocaleString()}
+                            {tx.type === 'income' ? '+' : '-'}₹{Number(tx.amount || 0).toLocaleString()}
                           </span>
                         </div>
                       ))}

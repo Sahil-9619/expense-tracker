@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   TrendingUp, Download,
   Calendar,
@@ -76,7 +76,7 @@ export default function Analytics({ transactions = [], wallets = [], budgets = [
                 >
                   {i % 3 === 0 && (
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap bg-[var(--bg-color)] border border-emerald-500/30 px-2 py-0.5 rounded text-[8px] font-black text-emerald-500">
-                      â‚¹{bar.value.toLocaleString()}
+                      ₹{bar.value.toLocaleString()}
                     </div>
                   )}
                 </motion.div>
