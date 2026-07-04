@@ -30,16 +30,15 @@ export default function Header({ isSidebarOpen, onToggleSidebar }) {
       document.exitFullscreen();
     }
   };
+
   const dispatch = useDispatch();
   const { user, loading } = useSelector((state) => state.auth);
   const pathname = location.pathname;
 
   useEffect(() => {
-    // Fetch latest user details from backend on mount
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
-  // Find the current active menu item by matching the path with the current pathname
   const currentItem = menuItems.find(item => item.path === pathname);
   const currentTitle = currentItem?.label || 'Dashboard';
 
@@ -83,7 +82,7 @@ export default function Header({ isSidebarOpen, onToggleSidebar }) {
             <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-tight">
               {user?.name || 'User'}
             </span>
-            <span className="text-[10px] text-emerald-500 font-black  tracking-widest opacity-80">
+            <span className="text-[10px] text-emerald-500 font-black tracking-widest opacity-80">
               {user?.email || 'email'}
             </span>
           </div>

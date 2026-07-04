@@ -22,8 +22,8 @@ import {
 } from '../../services/tracker.service';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from '../../components/UI/CustomToaster';
-import { 
-  ShoppingBag, Utensils, Car, Heart, 
+import {
+  ShoppingBag, Utensils, Car, Heart,
   Gamepad2, Lightbulb, User, MoreHorizontal,
   Home, BookOpen, Coffee, Dumbbell, Gift, Briefcase
 } from 'lucide-react';
@@ -177,50 +177,50 @@ export default function Tracker() {
 
   return (
     <div className="flex h-screen bg-[var(--bg-color)] overflow-hidden transition-colors duration-500 relative">
-      <Sidebar 
-        onLogout={handleLogout} 
-        isOpen={isSidebarOpen} 
-        setIsOpen={setIsSidebarOpen} 
+      <Sidebar
+        onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
       />
-      
+
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header 
-          isSidebarOpen={isSidebarOpen} 
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+        <Header
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
-        
+
         <main className="flex-1 relative overflow-y-auto no-scrollbar">
           <Routes>
             <Route index element={
-              <Dashboard 
-                transactions={transactions} 
+              <Dashboard
+                transactions={transactions}
                 budgets={budgets}
                 goals={goals}
                 categoryConfig={categoryConfig}
-                onAddClick={() => setIsTxModalOpen(true)} 
+                onAddClick={() => setIsTxModalOpen(true)}
               />
             } />
             <Route path="transactions" element={
-              <Transactions 
+              <Transactions
                 categoryConfig={categoryConfig}
                 onAddClick={() => setIsTxModalOpen(true)}
                 refreshTrigger={txRefreshTrigger}
               />
             } />
             <Route path="analytics" element={
-              <Analytics 
-                transactions={transactions} 
+              <Analytics
+                transactions={transactions}
                 budgets={budgets}
                 goals={goals}
-                categoryConfig={categoryConfig} 
+                categoryConfig={categoryConfig}
               />
             } />
             <Route path="reports" element={<Reports folders={reportFolders} reports={reports} onCreateReport={handleCreateReport} />} />
             <Route path="budgets" element={<Budgets budgets={budgets} transactions={transactions} onAddBudget={handleAddBudget} />} />
             <Route path="goals" element={<Goals goals={goals} onAddGoal={handleAddGoal} />} />
             <Route path="settings" element={
-              <Settings 
-                categories={categories} 
+              <Settings
+                categories={categories}
                 onAddCategory={(name, icon, accent) => {
                   const updated = {
                     ...categories,
@@ -238,15 +238,15 @@ export default function Tracker() {
               />
             } />
             <Route path="help" element={<Help />} />
-            
+
             {/* Fallback routes */}
             <Route path="*" element={<Dashboard transactions={transactions} budgets={budgets} goals={goals} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
           </Routes>
         </main>
       </div>
 
-      <TransactionDialog 
-        isOpen={isTxModalOpen} 
+      <TransactionDialog
+        isOpen={isTxModalOpen}
         onOpenChange={setIsTxModalOpen}
         onAdd={handleAddTransaction}
         categoryConfig={categoryConfig}

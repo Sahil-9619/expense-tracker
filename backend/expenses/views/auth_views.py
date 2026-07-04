@@ -17,6 +17,7 @@ from drf_yasg import openapi
 from expenses.serializers.user_serializer import UserSerializer, UserListSerializer
 from expenses.models import User, AuthOTP
 from expenses.services.google_oauth_service import verify_google_token, get_or_create_google_user
+from expenses.services.user_service import delete_user
 
 
 def generate_otp():
@@ -96,7 +97,11 @@ def signup(request):
     if existing_user and existing_user.is_active:
         return Response({"error": "User already exists. Please log in."}, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = UserSerializer(existing_user, data=request.data) if existing_user else UserSerializer(data=request.data)
+    if existing_user and not existing_user.is_active:
+        delete_user(existing_user)
+        existing_user = None
+
+    serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
         user.is_active = False

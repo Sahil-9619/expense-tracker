@@ -1,3 +1,5 @@
+import uuid
+
 from expenses.models import User
 
 
@@ -21,4 +23,8 @@ def update_user(user, data):
 
 
 def delete_user(user):
-    user.delete()
+    anonymized_email = f"deleted-{user.id}-{uuid.uuid4().hex[:8]}@deleted.expense"
+    user.email = anonymized_email
+    user.google_id = None
+    user.is_active = False
+    user.save(update_fields=['email', 'google_id', 'is_active'])

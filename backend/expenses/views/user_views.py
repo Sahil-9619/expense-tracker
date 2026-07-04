@@ -45,16 +45,23 @@ def user_detail(request, id):
 
     #UPDATE
     if request.method == 'PUT':
-        serializer = UserSerializer(user, data=request.data)
+        data = request.data.copy()
+
+        if 'current_password' in data:
+            current_password = data.pop('current_password')
+            if not user.check_password(current_password):
+                return Response({"error": "Current password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserSerializer(user, data=data)
 
         if serializer.is_valid():
-            data = serializer.validated_data
+            validated_data = serializer.validated_data
 
             # 🔐 hash password if present
-            if "password" in data:
-                data["password"] = hash_password(data["password"])
+            if "password" in validated_data:
+                validated_data["password"] = hash_password(validated_data["password"])
 
-            updated = update_user(user, data)
+            updated = update_user(user, validated_data)
 
             return Response({
                 "message": "User updated",
@@ -67,6 +74,6 @@ def user_detail(request, id):
     if request.method == 'DELETE':
         delete_user(user)
         return Response(
-            {"message": "User deleted"},
-            status=status.HTTP_204_NO_CONTENT
+            {"message": "User deactivated"},
+            status=status.HTTP_200_OK
         )

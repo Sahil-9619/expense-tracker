@@ -2,6 +2,7 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 from django.conf import settings
 from expenses.models import User
+from expenses.services.user_service import delete_user
 import logging
 
 logger = logging.getLogger(__name__)
@@ -54,15 +55,19 @@ def get_or_create_google_user(idinfo, action='login'):
         
         if user:
             if action == 'signup':
-                return None, "User already exists. Please log in."
-                
-            # Update google_id if not set
-            if not user.google_id:
-                user.google_id = google_id
-            if not user.is_active:
-                user.is_active = True
-            user.save(update_fields=['google_id', 'is_active'])
-            return user, None
+                if user.is_active:
+                    return None, "User already exists. Please log in."
+                delete_user(user)
+                user = None
+
+            else:
+                if not user.is_active:
+                    return None, "Account inactive. Please sign up again."
+                # Update google_id if not set
+                if not user.google_id:
+                    user.google_id = google_id
+                user.save(update_fields=['google_id', 'is_active'])
+                return user, None
         
         if action == 'login':
             return None, "User does not exist. Please sign up first."

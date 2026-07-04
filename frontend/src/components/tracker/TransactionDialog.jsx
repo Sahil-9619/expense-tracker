@@ -73,7 +73,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[var(--bg-color)] border-[var(--card-border)] sm:max-w-[420px] rounded-sm p-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-emerald-600 shadow-[0_0_15px_rgba(16,185,129,1)]" />
-        
+
         <DialogHeader className="px-8 pt-8 pb-4">
           <div className="flex items-center gap-4 mb-2">
             <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
@@ -109,10 +109,10 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
               <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Merchant / Description</Label>
               <div className="relative">
                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40 pointer-events-none" />
-                <Input 
+                <Input
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="System description..." 
+                  placeholder="System description..."
                   className="pl-9 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold"
                 />
               </div>
@@ -123,12 +123,15 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
                 <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Amount</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
-                  <Input 
+                  <Input
                     type="number"
+                    min="0"
+                    inputMode="decimal"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    onWheel={(e) => e.target.blur()}
-                    placeholder="0.00" 
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value.replace(/-/g, "") })}
+                    onWheel={(e) => { e.preventDefault(); e.currentTarget.blur(); }}
+                    onKeyDown={(e) => { if (["ArrowUp", "ArrowDown", "-", "Subtract"].includes(e.key)) e.preventDefault(); }}
+                    placeholder="0.00"
                     className="pl-8 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold"
                   />
                 </div>
@@ -137,7 +140,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
                 <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Date Point</Label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40 pointer-events-none" />
-                  <Input 
+                  <Input
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -156,8 +159,8 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
 
             <div className="space-y-2">
               <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Classification Hub</Label>
-              <Select 
-                value={formData.category} 
+              <Select
+                value={formData.category}
                 onValueChange={(val) => setFormData({ ...formData, category: val })}
               >
                 <SelectTrigger className="h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold">
@@ -199,7 +202,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
             </div>
           </div>
 
-          <Button 
+          <Button
             type="submit"
             className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white rounded-sm font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-emerald-500/20 group transition-all"
           >

@@ -22,7 +22,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
     <div className="fixed inset-0 bg-black/80 backdrop-blur-2xl z-[100] flex items-center justify-center p-6 animate-in fade-in duration-500">
       <div className="w-full max-w-xl relative animate-in zoom-in-95 slide-in-from-bottom-12 duration-700">
         <div className="absolute inset-0 bg-indigo-600/10 blur-[80px] rounded-full pointer-events-none" />
-        
+
         <div className="bento-card p-1">
           <div className="bg-slate-950 rounded-[1.9rem] overflow-hidden">
             {/* Header */}
@@ -43,16 +43,16 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
 
             <form onSubmit={handleSubmit} className="p-10 space-y-8">
               <div className="grid grid-cols-2 gap-4">
-                <button 
+                <button
                   type="button"
-                  onClick={() => setFormData({...formData, type: 'expense'})}
+                  onClick={() => setFormData({ ...formData, type: 'expense' })}
                   className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'expense' ? 'bg-[var(--text-primary)] text-[var(--bg-color)] border-[var(--text-primary)]' : 'bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >
                   Expense
                 </button>
-                <button 
+                <button
                   type="button"
-                  onClick={() => setFormData({...formData, type: 'income'})}
+                  onClick={() => setFormData({ ...formData, type: 'income' })}
                   className={`py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all border ${formData.type === 'income' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                 >
                   Inflow
@@ -60,29 +60,31 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
               </div>
 
               <div className="space-y-6">
-                <AuthInput 
-                  icon={Wallet} 
-                  label="Transaction Label" 
-                  placeholder="System description..." 
+                <AuthInput
+                  icon={Wallet}
+                  label="Transaction Label"
+                  placeholder="System description..."
                   value={formData.title}
-                  onChange={(val) => setFormData({...formData, title: val})}
+                  onChange={(val) => setFormData({ ...formData, title: val })}
                 />
 
                 <div className="grid grid-cols-2 gap-6">
-                  <AuthInput 
-                    icon={DollarSign} 
-                    label="Amount" 
-                    placeholder="0.00" 
+                  <AuthInput
+                    icon={DollarSign}
+                    label="Amount"
+                    placeholder="0.00"
                     type="number"
+                    min="0"
+                    inputMode="decimal"
                     value={formData.amount}
-                    onChange={(val) => setFormData({...formData, amount: val})}
+                    onChange={(val) => setFormData({ ...formData, amount: val.replace(/-/g, "") })}
                   />
-                  <AuthInput 
-                    icon={Calendar} 
-                    label="Temporal Point" 
+                  <AuthInput
+                    icon={Calendar}
+                    label="Temporal Point"
                     type="date"
                     value={formData.date}
-                    onChange={(val) => setFormData({...formData, date: val})}
+                    onChange={(val) => setFormData({ ...formData, date: val })}
                   />
                 </div>
 
@@ -90,10 +92,10 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Classification Hub</label>
                   <div className="relative group">
                     <Tag className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
-                    <select 
+                    <select
                       className="w-full bg-[var(--input-bg)] border border-[var(--card-border)] rounded-2xl px-14 py-4 text-sm font-bold text-[var(--text-primary)] focus:bg-[var(--card-bg)] focus:border-indigo-500/50 transition-all outline-none appearance-none cursor-pointer"
                       value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
                       {categories.map(cat => (
                         <option key={cat} value={cat} className="bg-slate-900 text-white">{cat}</option>
@@ -103,7 +105,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                 </div>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 className="w-full py-6 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group"
               >
@@ -123,12 +125,21 @@ function AuthInput({ icon: Icon, label, placeholder, type = "text", value, onCha
       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">{label}</label>
       <div className="relative group">
         <Icon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
-        <input 
-          type={type} 
+        <input
+          type={type}
           placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onWheel={(e) => { if(type === 'number') e.target.blur(); }}
+          min={type === 'number' ? '0' : undefined}
+          inputMode={type === 'number' ? 'decimal' : undefined}
+          onChange={(e) => {
+            let nextValue = e.target.value;
+            if (type === 'number') {
+              nextValue = nextValue.replace(/-/g, '');
+            }
+            onChange(nextValue);
+          }}
+          onWheel={(e) => { if (type === 'number') { e.preventDefault(); e.currentTarget.blur(); } }}
+          onKeyDown={(e) => { if (type === 'number' && ["ArrowUp", "ArrowDown", "-", "Subtract"].includes(e.key)) { e.preventDefault(); } }}
           className="w-full bg-[var(--input-bg)] border border-[var(--card-border)] rounded-2xl px-14 py-4 text-sm font-bold text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:bg-[var(--card-bg)] focus:border-indigo-500/50 transition-all outline-none"
         />
       </div>
