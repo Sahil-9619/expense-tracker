@@ -58,13 +58,14 @@ export default function BudgetDialog({ isOpen, onOpenChange, onAdd }) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Containment Magnitude</Label>
+              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Limit</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
                 <Input 
                   type="number"
                   value={formData.limit}
                   onChange={(e) => setFormData({ ...formData, limit: e.target.value })}
+                  onWheel={(e) => e.target.blur()}
                   placeholder="0.00" 
                   className="pl-8 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold"
                 />

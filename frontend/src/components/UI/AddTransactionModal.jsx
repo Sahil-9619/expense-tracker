@@ -71,7 +71,7 @@ export default function AddTransactionModal({ onClose, onAdd, categoryConfig }) 
                 <div className="grid grid-cols-2 gap-6">
                   <AuthInput 
                     icon={DollarSign} 
-                    label="Magnitude" 
+                    label="Amount" 
                     placeholder="0.00" 
                     type="number"
                     value={formData.amount}
@@ -128,6 +128,7 @@ function AuthInput({ icon: Icon, label, placeholder, type = "text", value, onCha
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onWheel={(e) => { if(type === 'number') e.target.blur(); }}
           className="w-full bg-[var(--input-bg)] border border-[var(--card-border)] rounded-2xl px-14 py-4 text-sm font-bold text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:bg-[var(--card-bg)] focus:border-indigo-500/50 transition-all outline-none"
         />
       </div>

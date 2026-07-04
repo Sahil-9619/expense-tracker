@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { setUser as setReduxUser } from '../../redux/slices/authSlice';
 import { updateUserProfile } from '../../services/user.service';
 import { motion } from 'motion/react';
 
-export default function Settings() {
+export default function Settings({ categories = {}, onAddCategory, onDeleteCategory }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -170,15 +170,40 @@ export default function Settings() {
           </Card>
         </motion.div>
 
-        {/* PREFERENCES BENTO */}
+        {/* CATEGORY HUB */}
         <motion.div variants={itemVariants} className="md:col-span-12 xl:col-span-8">
-           <Card className="bg-[var(--card-bg)]/50 backdrop-blur-xl rounded-2xl p-6 h-full">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
-                <PreferenceCard icon={Bell} title="System Alerts" desc="Configure notification streams" />
-                <PreferenceCard icon={CreditCard} title="Billing & Plan" desc="Manage API quotas and limits" />
-                <PreferenceCard icon={Terminal} title="Developer API" desc="Generate REST endpoints keys" />
-              </div>
-           </Card>
+          <Card className="bg-[var(--card-bg)]/50 backdrop-blur-xl rounded-2xl p-6 h-full space-y-6">
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-tight text-[var(--text-primary)]">Category Hub</h3>
+              <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">Create and manage custom transaction categories</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto pr-2">
+              {Object.keys(categories).map(catName => {
+                const cat = categories[catName];
+                const isDefault = ['Food', 'Shopping', 'Transport', 'Health', 'Entertainment', 'Bills', 'Personal', 'Other'].includes(catName);
+                return (
+                  <div key={catName} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border border-${cat.accent}-500/20 bg-${cat.accent}-500/5 text-${cat.accent}-400 text-xs font-bold uppercase tracking-wide`}>
+                    <span>{catName}</span>
+                    {!isDefault && (
+                      <button 
+                        type="button"
+                        onClick={() => onDeleteCategory(catName)} 
+                        className="hover:text-rose-500 transition-colors ml-1 text-[10px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-4 border-t border-[var(--card-border)]/50 space-y-4">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Create New Category</h4>
+              <CategoryForm onAddCategory={onAddCategory} />
+            </div>
+          </Card>
         </motion.div>
 
         {/* DANGER ZONE BENTO */}
@@ -241,6 +266,83 @@ function PreferenceCard({ icon: Icon, title, desc }) {
         <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1 opacity-60 leading-relaxed">{desc}</p>
       </div>
     </div>
+  );
+}
+
+function CategoryForm({ onAddCategory }) {
+  const [name, setName] = useState('');
+  const [icon, setIcon] = useState('Coffee');
+  const [accent, setAccent] = useState('emerald');
+
+  const icons = ['Coffee', 'Home', 'BookOpen', 'Dumbbell', 'Gift', 'Briefcase', 'Utensils', 'ShoppingBag', 'Car', 'Heart'];
+  const accents = ['emerald', 'indigo', 'rose', 'amber', 'sky', 'violet', 'pink'];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onAddCategory(name.trim(), icon, accent);
+    setName('');
+    toast.success(`Category "${name}" Created Successfully`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+      <div className="space-y-2">
+        <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.15em] ml-1">Category Name</Label>
+        <Input 
+          value={name} 
+          onChange={(e) => setName(e.target.value)}
+          placeholder="E.g., Groceries"
+          className="h-10 bg-[var(--bg-color)]/50 border-[var(--card-border)] rounded-xl text-xs font-bold focus-visible:ring-emerald-500/30"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.15em] ml-1">Accent Theme</Label>
+        <div className="flex flex-wrap gap-1.5 p-1 bg-[var(--bg-color)]/50 border border-[var(--card-border)] rounded-xl h-10 items-center justify-center">
+          {accents.map(acc => {
+            const colorClasses = {
+              emerald: 'bg-emerald-500 hover:bg-emerald-400',
+              indigo: 'bg-indigo-500 hover:bg-indigo-400',
+              rose: 'bg-rose-500 hover:bg-rose-400',
+              amber: 'bg-amber-500 hover:bg-amber-400',
+              sky: 'bg-sky-500 hover:bg-sky-400',
+              violet: 'bg-violet-500 hover:bg-violet-400',
+              pink: 'bg-pink-500 hover:bg-pink-400'
+            };
+            return (
+              <button
+                key={acc}
+                type="button"
+                onClick={() => setAccent(acc)}
+                className={`w-5 h-5 rounded-full ${colorClasses[acc]} transition-transform ${accent === acc ? 'scale-125 border border-white' : 'opacity-60 hover:opacity-100'}`}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <div className="flex-1 space-y-2">
+          <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.15em] ml-1">Symbol</Label>
+          <select
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            className="w-full h-10 bg-[var(--bg-color)]/50 border border-[var(--card-border)] rounded-xl text-xs font-bold text-[var(--text-primary)] outline-none px-3 cursor-pointer"
+          >
+            {icons.map(ic => (
+              <option key={ic} value={ic} className="bg-slate-900 text-white">{ic}</option>
+            ))}
+          </select>
+        </div>
+        <Button 
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[9px] h-10 px-4 rounded-xl shadow-lg shadow-emerald-500/20"
+        >
+          Add
+        </Button>
+      </div>
+    </form>
   );
 }
 

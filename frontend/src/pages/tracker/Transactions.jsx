@@ -26,6 +26,32 @@ import { Card } from "@/components/ui/card";
 import { motion } from 'motion/react';
 
 export default function Transactions({ transactions = [], onAddClick }) {
+  const handleExportCSV = () => {
+    if (!transactions.length) return;
+    const headers = ["Date", "Description", "Category", "Type", "Amount"];
+    const rows = transactions.map(tx => [
+      tx.date,
+      tx.merchant || tx.description || '',
+      tx.category || '',
+      tx.type || '',
+      tx.amount || 0
+    ]);
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `transactions_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="p-4 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
@@ -34,7 +60,11 @@ export default function Transactions({ transactions = [], onAddClick }) {
           <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Your recent transactions and history</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="h-8 text-[9px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] text-[var(--text-primary)] px-4">
+          <Button 
+            onClick={handleExportCSV}
+            variant="outline" 
+            className="h-8 text-[9px] font-black uppercase tracking-widest rounded-sm border-[var(--card-border)] text-[var(--text-primary)] px-4"
+          >
             <Download className="mr-2 h-3 w-3" /> Export Data
           </Button>
           <Button 

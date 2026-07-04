@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'motion/react';
@@ -7,9 +7,29 @@ import { cn } from '../lib/utils';
 import { menuItems } from './Sidebar';
 import { AnimatedThemeToggler } from './UI/animated-theme-toggler';
 import { fetchUserProfile } from '../redux/slices/authSlice';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 export default function Header({ isSidebarOpen, onToggleSidebar }) {
   const location = useLocation();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error("Error attempting to enable fullscreen", err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
   const dispatch = useDispatch();
   const { user, loading } = useSelector((state) => state.auth);
   const pathname = location.pathname;
@@ -43,7 +63,14 @@ export default function Header({ isSidebarOpen, onToggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleFullscreen}
+            className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-emerald-500 hover:bg-emerald-500/5 transition-all cursor-pointer flex items-center justify-center"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
           <AnimatedThemeToggler
             variant="circle"
             duration={500}

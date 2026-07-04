@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   MoreVertical,
   TrendingUp,
@@ -12,44 +13,113 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-export defau PS D:\expense-tracker\backend> python manage.py runserver
-Watching for file changes with StatReloader
-Exception in thread django-main-thread:
-Traceback (most recent call last):
-  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1045, in _bootstrap_inner    
-    self.run()
-  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 982, in run
-    self._target(*self._args, **self._kwargs)
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
-    fn(*args, **kwargs)
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\core\management\commands\runserver.py", line 124, in inner_run
-    autoreload.raise_last_exception()
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 86, in raise_last_exception
-    raise _exception[1]
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\core\management\__init__.py", line 394, in execute
-    autoreload.check_errors(django.setup)()
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
-    fn(*args, **kwargs)
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\__init__.py", line 24, in setup
-    apps.populate(settings.INSTALLED_APPS)
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\apps\registry.py", line 116, in populate
-    app_config.import_models()
-  File "D:\expense-tracker\backend\env\Lib\site-packages\django\apps\config.py", line 269, in import_models
-    self.models_module = import_module(models_module_name)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\importlib\__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked  
-  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 940, in exec_module      
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed 
-  File "D:\expense-tracker\backend\expenses\models\__init__.py", line 2, in <module>
-    from .expense_model import Budget, Expense, Goal, Report, ReportFolder, Wallet
-ImportError: cannot import name 'Wallet' from 'expenses.models.expense_model' (D:\expense-tracker\backend\expenses\models\expense_model.py)
-lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryConfig = {}, onAddClick }) {
+export default function Dashboard({ transactions = [], budgets = [], goals = [], categoryConfig = {}, onAddClick }) {
+  const [timeRange, setTimeRange] = useState('1M');
+
+  const chartData = useMemo(() => {
+    if (!transactions.length) {
+      return { points: [], path: '', areaPath: '', labels: [] };
+    }
+
+    const now = new Date();
+    let startDate = new Date();
+    let isDaily = true;
+
+    if (timeRange === '1W') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (timeRange === '1M') {
+      startDate.setDate(now.getDate() - 30);
+    } else if (timeRange === '3M') {
+      startDate.setDate(now.getDate() - 90);
+    } else if (timeRange === '1Y') {
+      startDate.setFullYear(now.getFullYear() - 1);
+      isDaily = false;
+    } else {
+      const dates = transactions.map(t => new Date(t.date));
+      startDate = dates.length ? new Date(Math.min(...dates)) : new Date();
+      const diffTime = Math.abs(now - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      isDaily = diffDays <= 90;
+    }
+
+    const inRangeTx = transactions.filter(t => new Date(t.date) >= startDate);
+    const outOfRangeTx = transactions.filter(t => new Date(t.date) < startDate);
+
+    let runningBalance = outOfRangeTx.reduce((acc, curr) => {
+      const amt = parseFloat(curr.amount) || 0;
+      return curr.type === 'income' ? acc + amt : acc - amt;
+    }, 0);
+
+    const formatDateKey = (date) => {
+      if (isDaily) {
+        return date.toISOString().split('T')[0];
+      } else {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      }
+    };
+
+    const datePoints = [];
+    let current = new Date(startDate);
+    while (current <= now) {
+      datePoints.push(new Date(current));
+      if (isDaily) {
+        current.setDate(current.getDate() + 1);
+      } else {
+        current.setMonth(current.getMonth() + 1);
+      }
+    }
+
+    const flows = {};
+    inRangeTx.forEach(t => {
+      const key = formatDateKey(new Date(t.date));
+      const amt = parseFloat(t.amount) || 0;
+      const net = t.type === 'income' ? amt : -amt;
+      flows[key] = (flows[key] || 0) + net;
+    });
+
+    const points = datePoints.map(date => {
+      const key = formatDateKey(date);
+      const flow = flows[key] || 0;
+      runningBalance += flow;
+      
+      let label = '';
+      if (isDaily) {
+        label = date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      } else {
+        label = date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+      }
+
+      return {
+        date,
+        balance: runningBalance,
+        label
+      };
+    });
+
+    const balances = points.map(p => p.balance);
+    const minVal = Math.min(...balances, 0);
+    const maxVal = Math.max(...balances, 100);
+    const valRange = maxVal - minVal || 1;
+
+    const svgPoints = points.map((p, index) => {
+      const x = points.length > 1 ? (index / (points.length - 1)) * 100 : 50;
+      const y = 35 - ((p.balance - minVal) / valRange) * 30;
+      return { x, y, balance: p.balance, label: p.label };
+    });
+
+    let path = '';
+    let areaPath = '';
+    if (svgPoints.length > 0) {
+      path = `M ${svgPoints[0].x} ${svgPoints[0].y} ` + svgPoints.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+      areaPath = `${path} L ${svgPoints[svgPoints.length - 1].x} 40 L ${svgPoints[0].x} 40 Z`;
+    }
+
+    const labelStep = Math.max(Math.floor(points.length / 5), 1);
+    const labels = svgPoints.filter((_, idx) => idx % labelStep === 0 || idx === points.length - 1);
+
+    return { points: svgPoints, path, areaPath, labels };
+  }, [transactions, timeRange]);
+
   const { balance, totalIncome, totalExpense } = useMemo(() => {
     return transactions.reduce((acc, curr) => {
       const amount = parseFloat(curr.amount);
@@ -65,7 +135,7 @@ lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryCon
   }, [transactions]);
 
   const sortedTransactions = useMemo(() => {
-    return [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+    return [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
   }, [transactions]);
 
   const savingsRate = totalIncome > 0 ? Math.max(((totalIncome - totalExpense) / totalIncome) * 100, 0) : 0;
@@ -94,9 +164,6 @@ lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryCon
             <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest opacity-60">Real-time financial overview</p>
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] hover:bg-[var(--bg-color)] transition-all">
-              <Download size={12} /> Export CSV
-            </button>
             <button 
               onClick={onAddClick}
               className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-sm bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-500/20"
@@ -152,42 +219,64 @@ lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryCon
             <span className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-widest">{budgets.length} budgets active</span>
           </div>
 
-          {/* --- ROW 2: Advanced Main Chart & Quick Actions --- */}
-          <div className={`${cardBase} col-span-12 lg:col-span-12 min-h-[220px]`}>
+          {/* --- ROW 2: Advanced Main Chart & Recent Transactions --- */}
+          <div className={`${cardBase} col-span-12 lg:col-span-6 min-h-[380px] flex flex-col`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Cash Flow Analysis</h2>
               <div className="flex gap-1 bg-[var(--bg-color)] p-0.5 rounded-sm border border-[var(--card-border)]">
                 {['1W', '1M', '3M', '1Y', 'ALL'].map(range => (
-                  <button key={range} className={`text-[9px] px-2 py-1 rounded-sm font-black uppercase tracking-widest ${range === '1M' ? 'bg-emerald-600 text-white shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>
+                  <button 
+                    key={range} 
+                    onClick={() => setTimeRange(range)}
+                    className={`text-[9px] px-2 py-1 rounded-sm font-black uppercase tracking-widest ${range === timeRange ? 'bg-emerald-600 text-white shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+                  >
                     {range}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="relative flex-1 w-full h-full pt-4 min-h-[150px]">
-              <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-                <defs>
-                  <linearGradient id="colorEmerald" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <path d="M0,30 L15,25 L30,28 L45,15 L60,20 L75,10 L90,15 L100,5 L100,40 L0,40 Z" fill="url(#colorEmerald)" />
-                <path d="M0,30 L15,25 L30,28 L45,15 L60,20 L75,10 L90,15 L100,5" fill="none" stroke="#10b981" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-              </svg>
+            <div className="relative flex-1 w-full h-full pt-4 min-h-[250px] flex flex-col justify-between">
+              {chartData.path ? (
+                <div className="relative flex-1 w-full h-full min-h-[200px]">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                    <defs>
+                      <linearGradient id="colorEmerald" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <path d={chartData.areaPath} fill="url(#colorEmerald)" />
+                    <path d={chartData.path} fill="none" stroke="#10b981" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-[10px] uppercase font-black tracking-widest text-[var(--text-secondary)] opacity-40">
+                  No data points in this timeframe
+                </div>
+              )}
+              
+              {/* X Axis Labels */}
+              {chartData.labels.length > 0 && (
+                <div className="flex justify-between mt-2 pt-2 border-t border-[var(--card-border)]/30">
+                  {chartData.labels.map((lbl, idx) => (
+                    <span key={idx} className="text-[8px] font-black text-[var(--text-secondary)] uppercase tracking-wider">
+                      {lbl.label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
 
 
-          {/* --- ROW 3: Dense Transaction Table --- */}
-          <div className={`${cardBase} col-span-12 lg:col-span-8`}>
+          <div className={`${cardBase} col-span-12 lg:col-span-6`}>
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Recent Transactions</h2>
-              <button className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-emerald-500 transition-all">
-                <Filter size={10} /> Filter
-              </button>
+              <Link to="/dashboard/transactions" className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-emerald-500 transition-all">
+                View All
+              </Link>
             </div>
 
             <div className="overflow-x-auto">
@@ -236,36 +325,7 @@ lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryCon
             </div>
           </div>
 
-          {/* Asset Allocation */}
-          <div className={`${cardBase} col-span-12 lg:col-span-4`}>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)] mb-6">Asset Distribution</h2>
 
-            <div className="flex flex-col gap-5">
-              {assetDistribution.length === 0 ? (
-                <div className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40 text-center py-6">
-                  No goals found
-                </div>
-              ) : assetDistribution.map((asset, i) => {
-                const value = assetTotal ? (Math.abs(asset.amount) / assetTotal) * 100 : 0;
-                return (
-                <div key={i} className="flex flex-col gap-2">
-                  <div className="flex justify-between items-end text-[10px]">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${asset.color}`}></div>
-                      <span className="font-black uppercase tracking-widest text-[var(--text-secondary)]">{asset.label}</span>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <span className="text-[var(--text-secondary)] font-bold opacity-40">{value.toFixed(1)}%</span>
-                      <span className="font-mono font-black text-[var(--text-primary)] tracking-tighter">₹{asset.amount.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <div className="w-full h-1 bg-[var(--bg-color)] rounded-full overflow-hidden border border-[var(--card-border)]">
-                    <div className={`h-full ${asset.color} shadow-[0_0_10px_rgba(0,0,0,0.5)]`} style={{ width: `${value}%` }}></div>
-                  </div>
-                </div>
-              )})}
-            </div>
-          </div>
 
         </div>
       </div>

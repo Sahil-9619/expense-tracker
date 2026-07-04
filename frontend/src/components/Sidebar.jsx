@@ -117,7 +117,7 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
             return (
               <div key={section} className="flex flex-col gap-1">
                 {isOpen && (
-                  <span className="px-2.5 text-[8px] font-black uppercase tracking-[0.3em] text-[var(--text-secondary)] opacity-30 mb-1">
+                  <span className="px-2.5 text-[9px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-1.5">
                     {section}
                   </span>
                 )}
@@ -159,44 +159,22 @@ export default function Sidebar({ onLogout, isOpen, setIsOpen }) {
         {/* Footer Section - Completed Bottom Section */}
         <div className="mt-auto px-2 pt-4 border-t border-[var(--card-border)] bg-[var(--bg-color)]/50 backdrop-blur-sm">
           {isOpen ? (
-            <div className="flex flex-col gap-4 mb-2">
-              <div className="flex items-center gap-3 px-2 py-1">
-                <div className="w-8 h-8 rounded-sm bg-gradient-to-tr from-[var(--brand-primary)] to-emerald-600 flex items-center justify-center text-white font-black text-sm shadow-lg overflow-hidden shrink-0 border border-[var(--card-border)]">
-                  {user?.profile_pic ? (
-                    <img src={user.profile_pic} alt="User" className="w-full h-full object-cover" />
-                  ) : (
-                    user?.name?.[0]?.toUpperCase() || 'U'
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-black text-[var(--text-primary)] truncate uppercase tracking-tight">
-                    {user?.name || 'Authorized User'}
-                  </span>
-                  <span className="text-[8px] text-emerald-500 font-bold truncate opacity-80 uppercase tracking-[0.2em]">
-                    PRO MEMBER
-                  </span>
-                </div>
+            <button 
+              onClick={onLogout}
+              className="flex items-center justify-between w-full p-2 rounded-sm bg-rose-500/5 text-rose-500 hover:bg-rose-500/10 transition-all border border-rose-500/10 group mb-2"
+            >
+              <div className="flex items-center gap-2.5">
+                <LogOut size={14} strokeWidth={3} />
+                <span className="text-[9px] font-black uppercase tracking-widest">Logout</span>
               </div>
-              
-              <button 
-                onClick={onLogout}
-                className="flex items-center justify-between w-full p-2 rounded-sm bg-rose-500/5 text-rose-500 hover:bg-rose-500/10 transition-all border border-rose-500/10 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <LogOut size={14} strokeWidth={3} />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Logout</span>
-                </div>
-                <ChevronRight size={12} className="opacity-40 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
+              <ChevronRight size={12} className="opacity-40 group-hover:translate-x-0.5 transition-transform" />
+            </button>
           ) : (
-            <div className="flex flex-col items-center gap-4 pb-2">
-              <div className="w-8 h-8 rounded-sm bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 cursor-pointer hover:bg-emerald-500 hover:text-white transition-all">
-                <UserCircle size={18} />
-              </div>
+            <div className="flex flex-col items-center pb-2">
               <button 
                 onClick={onLogout}
                 className="p-2 rounded-sm text-rose-500 hover:bg-rose-500/10 transition-all border border-transparent hover:border-rose-500/20"
+                title="Logout"
               >
                 <LogOut size={16} strokeWidth={2.5} />
               </button>

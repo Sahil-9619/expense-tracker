@@ -78,7 +78,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
             <div className="space-y-2">
               <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Merchant / Description</Label>
               <div className="relative">
-                <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40" />
+                <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40 pointer-events-none" />
                 <Input 
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -90,13 +90,14 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Magnitude</Label>
+                <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Amount</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-500">₹</span>
                   <Input 
                     type="number"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    onWheel={(e) => e.target.blur()}
                     placeholder="0.00" 
                     className="pl-8 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold"
                   />
@@ -105,12 +106,19 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
               <div className="space-y-2">
                 <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Date Point</Label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-secondary)] opacity-40 pointer-events-none" />
                   <Input 
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="pl-9 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold"
+                    onClick={(e) => {
+                      try {
+                        e.target.showPicker();
+                      } catch (err) {
+                        console.warn("showPicker not supported", err);
+                      }
+                    }}
+                    className="pl-9 h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold cursor-pointer"
                   />
                 </div>
               </div>
