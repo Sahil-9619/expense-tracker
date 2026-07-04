@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from 'motion/react';
 
-export default function Analytics({ transactions = [], wallets = [], budgets = [], goals = [], categoryConfig }) {
+export default function Analytics({ transactions = [], budgets = [], goals = [], categoryConfig }) {
   const monthlyBars = useMemo(() => {
     const buckets = Array.from({ length: 12 }, () => 0);
     transactions.forEach((tx) => {
@@ -97,7 +97,7 @@ export default function Analytics({ transactions = [], wallets = [], budgets = [
             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Key Metrics</h2>
             <div className="space-y-4">
               <VitalItem icon={TrendingUp} label="Growth Rate" value={`${growth.toFixed(1)}%`} color={growth >= 0 ? "text-emerald-500" : "text-rose-500"} />
-              <VitalItem icon={Globe} label="Wallets" value={wallets.length} color="text-indigo-500" />
+              <VitalItem icon={Globe} label="Transactions" value={transactions.length} color="text-indigo-500" />
               <VitalItem icon={Cpu} label="Budget Rules" value={budgets.length} color="text-amber-500" />
               <VitalItem icon={Radio} label="Active Goals" value={goals.filter(goal => !goal.completed).length} color="text-emerald-500" />
             </div>

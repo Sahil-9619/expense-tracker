@@ -18,7 +18,7 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
     amount: '',
     category: 'Food',
     type: 'expense',
-    wallet: '',
+    payment_mode: 'Cash',
     date: new Date().toISOString().split('T')[0]
   });
 
@@ -27,14 +27,14 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.description || !formData.amount) return;
-    onAdd({ ...formData, wallet: formData.wallet || null });
+    onAdd({ ...formData });
     onOpenChange(false);
     setFormData({
       description: '',
       amount: '',
       category: 'Food',
       type: 'expense',
-      wallet: '',
+      payment_mode: 'Cash',
       date: new Date().toISOString().split('T')[0]
     });
   };
@@ -139,21 +139,21 @@ export default function TransactionDialog({ isOpen, onOpenChange, onAdd, categor
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Liquidity Node</Label>
+              <Label className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-widest ml-1">Payment Mode</Label>
               <Select
-                value={formData.wallet}
-                onValueChange={(val) => setFormData({ ...formData, wallet: val })}
+                value={formData.payment_mode}
+                onValueChange={(val) => setFormData({ ...formData, payment_mode: val })}
               >
                 <SelectTrigger className="h-11 bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm text-xs font-bold">
                   <div className="flex items-center gap-2">
                     <Wallet size={14} className="text-emerald-500" />
-                    <SelectValue placeholder="Select Wallet" />
+                    <SelectValue placeholder="Select Payment Mode" />
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-color)] border-[var(--card-border)] rounded-sm">
-                  {wallets.map(wallet => (
-                    <SelectItem key={wallet.id} value={String(wallet.id)} className="text-xs font-bold uppercase tracking-tight text-[var(--text-primary)] hover:bg-emerald-500/10 hover:text-emerald-500">
-                      {wallet.name}
+                  {['Cash', 'UPI', 'Debit Card', 'Credit Card'].map(mode => (
+                    <SelectItem key={mode} value={mode} className="text-xs font-bold uppercase tracking-tight text-[var(--text-primary)] hover:bg-emerald-500/10 hover:text-emerald-500">
+                      {mode}
                     </SelectItem>
                   ))}
                 </SelectContent>

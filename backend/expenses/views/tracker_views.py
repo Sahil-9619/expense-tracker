@@ -5,13 +5,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from expenses.models import Budget, Goal, Report, ReportFolder, Wallet
+from expenses.models import Budget, Goal, Report, ReportFolder
 from expenses.serializers import (
     BudgetSerializer,
     GoalSerializer,
     ReportFolderSerializer,
     ReportSerializer,
-    WalletSerializer,
 )
 
 
@@ -47,16 +46,7 @@ def _detail(request, model, serializer_class, id):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def wallet_list(request):
-    return _list_create(request, Wallet, WalletSerializer)
 
-
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def wallet_detail(request, id):
-    return _detail(request, Wallet, WalletSerializer, id)
 
 
 @api_view(['GET', 'POST'])

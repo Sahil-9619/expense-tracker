@@ -6,5 +6,4 @@ from .expense_serializer import (
     GoalSerializer,
     ReportFolderSerializer,
     ReportSerializer,
-    WalletSerializer,
 )

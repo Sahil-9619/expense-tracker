@@ -7,13 +7,9 @@ from expenses.views.tracker_views import (
     report_detail,
     report_folder_list,
     report_list,
-    wallet_detail,
-    wallet_list,
 )
 
 urlpatterns = [
-    path('wallets/', wallet_list),
-    path('wallets/<int:id>/', wallet_detail),
     path('budgets/', budget_list),
     path('budgets/<int:id>/', budget_detail),
     path('goals/', goal_list),

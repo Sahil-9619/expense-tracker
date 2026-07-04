@@ -12,7 +12,44 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-export default function Dashboard({ transactions = [], wallets = [], budgets = [], goals = [], categoryConfig = {}, onAddClick }) {
+export defau PS D:\expense-tracker\backend> python manage.py runserver
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1045, in _bootstrap_inner    
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\core\management\commands\runserver.py", line 124, in inner_run
+    autoreload.raise_last_exception()
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 86, in raise_last_exception
+    raise _exception[1]
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\core\management\__init__.py", line 394, in execute
+    autoreload.check_errors(django.setup)()
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\apps\registry.py", line 116, in populate
+    app_config.import_models()
+  File "D:\expense-tracker\backend\env\Lib\site-packages\django\apps\config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\importlib\__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked  
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module      
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed 
+  File "D:\expense-tracker\backend\expenses\models\__init__.py", line 2, in <module>
+    from .expense_model import Budget, Expense, Goal, Report, ReportFolder, Wallet
+ImportError: cannot import name 'Wallet' from 'expenses.models.expense_model' (D:\expense-tracker\backend\expenses\models\expense_model.py)
+lt function Dashboard({ transactions = [], budgets = [], goals = [], categoryConfig = {}, onAddClick }) {
   const { balance, totalIncome, totalExpense } = useMemo(() => {
     return transactions.reduce((acc, curr) => {
       const amount = parseFloat(curr.amount);
@@ -31,27 +68,17 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
     return [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
   }, [transactions]);
 
-  const walletBalance = useMemo(() => {
-    return wallets.reduce((sum, wallet) => sum + Number(wallet.balance || 0), 0);
-  }, [wallets]);
-
   const savingsRate = totalIncome > 0 ? Math.max(((totalIncome - totalExpense) / totalIncome) * 100, 0) : 0;
-  const primaryWallet = wallets[0];
   const targetGoal = goals.find((goal) => !goal.completed) || goals[0];
   const assetDistribution = useMemo(() => {
     return [
-      ...wallets.map((wallet) => ({
-        label: wallet.name,
-        amount: Number(wallet.balance || 0),
-        color: `bg-${wallet.color || 'emerald'}-500`,
-      })),
       ...goals.map((goal) => ({
         label: goal.title,
         amount: Number(goal.current || 0),
         color: `bg-${goal.color || 'indigo'}-500`,
       })),
     ].filter((asset) => asset.amount !== 0);
-  }, [wallets, goals]);
+  }, [goals]);
   const assetTotal = assetDistribution.reduce((sum, asset) => sum + Math.abs(asset.amount), 0);
 
   const cardBase = "relative rounded-sm border border-[var(--card-border)] p-4 flex flex-col bg-[var(--card-bg)] transition-all duration-200 hover:shadow-lg hover:shadow-black/20";
@@ -126,7 +153,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
           </div>
 
           {/* --- ROW 2: Advanced Main Chart & Quick Actions --- */}
-          <div className={`${cardBase} col-span-12 lg:col-span-8 min-h-[220px]`}>
+          <div className={`${cardBase} col-span-12 lg:col-span-12 min-h-[220px]`}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Cash Flow Analysis</h2>
               <div className="flex gap-1 bg-[var(--bg-color)] p-0.5 rounded-sm border border-[var(--card-border)]">
@@ -152,50 +179,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
             </div>
           </div>
 
-          {/* Quick Transfer Panel */}
-          <div className={`${cardBase} col-span-12 lg:col-span-4 min-h-[220px] flex flex-col`}>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)]">Quick Transfer</h2>
-            </div>
 
-            <div className="p-3 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/40 flex flex-col gap-2 mb-2">
-              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">From Wallet</span>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center"><Wallet size={12} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{primaryWallet?.name || 'No Wallet Connected'}</span>
-                </div>
-                <span className="text-[10px] font-black font-mono text-[var(--text-primary)]">₹{Number(primaryWallet?.balance || walletBalance || balance).toLocaleString()}</span>
-              </div>
-            </div>
-
-            <div className="relative h-6 flex items-center justify-center -my-2 z-10">
-              <button className="w-6 h-6 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-center transition-transform hover:rotate-180 text-emerald-500">
-                <ArrowRightLeft size={10} className="rotate-90" />
-              </button>
-            </div>
-
-            <div className="p-3 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/40 flex flex-col gap-2 mt-2">
-              <span className="text-[9px] text-[var(--text-secondary)] font-black uppercase tracking-widest">To Goal</span>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded bg-indigo-500/20 text-indigo-500 flex items-center justify-center"><PieChart size={12} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-[var(--text-primary)]">{targetGoal?.title || 'No Goal Selected'}</span>
-                </div>
-                <ChevronDown size={14} className="text-[var(--text-secondary)]" />
-              </div>
-            </div>
-
-            <div className="mt-auto flex gap-2 pt-4">
-              <div className="flex-1 flex items-center px-3 py-1.5 rounded-sm border border-[var(--card-border)] bg-[var(--bg-color)]/20">
-                <span className="text-[var(--text-secondary)] text-xs">₹</span>
-                <input type="text" placeholder="0.00" className="bg-transparent border-none outline-none w-full text-xs font-mono ml-1 placeholder-[var(--text-secondary)] text-[var(--text-primary)]" />
-              </div>
-              <button className="px-4 py-1.5 bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] rounded-sm hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/10">
-                Execute
-              </button>
-            </div>
-          </div>
 
           {/* --- ROW 3: Dense Transaction Table --- */}
           <div className={`${cardBase} col-span-12 lg:col-span-8`}>
@@ -259,7 +243,7 @@ export default function Dashboard({ transactions = [], wallets = [], budgets = [
             <div className="flex flex-col gap-5">
               {assetDistribution.length === 0 ? (
                 <div className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)] opacity-40 text-center py-6">
-                  No wallets or goals found
+                  No goals found
                 </div>
               ) : assetDistribution.map((asset, i) => {
                 const value = assetTotal ? (Math.abs(asset.amount) / assetTotal) * 100 : 0;

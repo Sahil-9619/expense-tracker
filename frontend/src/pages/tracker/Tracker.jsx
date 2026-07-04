@@ -5,7 +5,6 @@ import Header from '../../components/Header';
 import Dashboard from './Dashboard';
 import Analytics from './Analytics';
 import Settings from './Settings';
-import Wallets from './Wallets';
 import Transactions from './Transactions';
 import Budgets from './Budgets';
 import Goals from './Goals';
@@ -16,13 +15,10 @@ import { getExpenses, createExpense } from '../../services/expense.service';
 import {
   createBudget,
   createGoal,
-  createReport,
-  createWallet,
   getBudgets,
   getGoals,
   getReportFolders,
-  getReports,
-  getWallets
+  getReports
 } from '../../services/tracker.service';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
@@ -44,7 +40,6 @@ const categoryConfig = {
 
 export default function Tracker() {
   const [transactions, setTransactions] = useState([]);
-  const [wallets, setWallets] = useState([]);
   const [budgets, setBudgets] = useState([]);
   const [goals, setGoals] = useState([]);
   const [reportFolders, setReportFolders] = useState([]);
@@ -65,32 +60,28 @@ export default function Tracker() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   const fetchTrackerData = useCallback(async () => {
     try {
-      const [
-        transactionData,
-        walletData,
-        budgetData,
-        goalData,
-        folderData,
-        reportData
-      ] = await Promise.all([
-        getExpenses(),
-        getWallets(),
-        getBudgets(),
-        getGoals(),
-        getReportFolders(),
-        getReports()
-      ]);
+      const expenses = await getExpenses().catch(err => { console.error('Expenses error:', err); return []; });
+      const budgets = await getBudgets().catch(err => { console.error('Budgets error:', err); return []; });
+      const goals = await getGoals().catch(err => { console.error('Goals error:', err); return []; });
+      const folders = await getReportFolders().catch(err => { console.error('Folders error:', err); return []; });
+      const reports = await getReports().catch(err => { console.error('Reports error:', err); return []; });
 
-      setTransactions(transactionData || []);
-      setWallets(walletData || []);
-      setBudgets(budgetData || []);
-      setGoals(goalData || []);
-      setReportFolders(folderData || []);
-      setReports(reportData || []);
-    } catch {
+      console.log('--- DEBUG INFO ---');
+      console.log('Fetched expenses:', expenses);
+      console.log('Fetched budgets:', budgets);
+      console.log('Fetched goals:', goals);
+      console.log('Fetched folders:', folders);
+      console.log('Fetched reports:', reports);
+
+      setTransactions(expenses);
+      setBudgets(budgets);
+      setGoals(goals);
+      setReportFolders(folders);
+      setReports(reports);
+    } catch (err) {
+      console.error('Tracker data error:', err);
       toast.error('Unable to load tracker data');
     }
   }, []);
@@ -112,15 +103,7 @@ export default function Tracker() {
     }
   };
 
-  const handleAddWallet = async (walletData) => {
-    try {
-      await createWallet(walletData);
-      toast.success('Liquidity Node Connected Successfully');
-      fetchTrackerData();
-    } catch (err) {
-      toast.error(err.message || 'Unable to connect wallet');
-    }
-  };
+
 
   const handleAddBudget = async (budgetData) => {
     try {
@@ -176,14 +159,12 @@ export default function Tracker() {
             <Route index element={
               <Dashboard 
                 transactions={transactions} 
-                wallets={wallets}
                 budgets={budgets}
                 goals={goals}
                 categoryConfig={categoryConfig}
                 onAddClick={() => setIsTxModalOpen(true)} 
               />
             } />
-            <Route path="wallets" element={<Wallets wallets={wallets} onAddWallet={handleAddWallet} transactions={transactions} />} />
             <Route path="transactions" element={
               <Transactions 
                 transactions={transactions} 
@@ -193,7 +174,6 @@ export default function Tracker() {
             <Route path="analytics" element={
               <Analytics 
                 transactions={transactions} 
-                wallets={wallets}
                 budgets={budgets}
                 goals={goals}
                 categoryConfig={categoryConfig} 
@@ -206,7 +186,7 @@ export default function Tracker() {
             <Route path="help" element={<Help />} />
             
             {/* Fallback routes */}
-            <Route path="*" element={<Dashboard transactions={transactions} wallets={wallets} budgets={budgets} goals={goals} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
+            <Route path="*" element={<Dashboard transactions={transactions} budgets={budgets} goals={goals} categoryConfig={categoryConfig} onAddClick={() => setIsTxModalOpen(true)} />} />
           </Routes>
         </main>
       </div>
@@ -216,7 +196,6 @@ export default function Tracker() {
         onOpenChange={setIsTxModalOpen}
         onAdd={handleAddTransaction}
         categoryConfig={categoryConfig}
-        wallets={wallets}
       />
     </div>
   );

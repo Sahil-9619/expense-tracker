@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from expenses.models import Budget, Expense, Goal, Report, ReportFolder, Wallet
+from expenses.models import Budget, Expense, Goal, Report, ReportFolder
 
 
 
@@ -8,7 +8,7 @@ class ExpenseListSerializer(serializers.ModelSerializer):
         model = Expense
         fields = [
             'id', 'title', 'description', 'amount', 'category',
-            'type', 'wallet', 'date', 'created_at', 'updated_at'
+            'type', 'payment_mode', 'date', 'created_at', 'updated_at'
         ]
 
 
@@ -18,7 +18,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
         model = Expense
         fields = [
             'id', 'user', 'title', 'description', 'amount', 'category',
-            'type', 'wallet', 'date', 'created_at', 'updated_at'
+            'type', 'payment_mode', 'date', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
@@ -49,23 +49,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Category is required")
         return value
 
-    def validate_wallet(self, value):
-        request = self.context.get('request')
-        if value and request and value.user != request.user:
-            raise serializers.ValidationError("Wallet does not belong to the current user")
-        return value
 
-
-class WalletSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Wallet
-        fields = ['id', 'user', 'name', 'type', 'balance', 'color', 'status', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
-
-    def validate_name(self, value):
-        if not value or value.strip() == "":
-            raise serializers.ValidationError("Name is required")
-        return value.strip()
 
 
 class BudgetSerializer(serializers.ModelSerializer):
@@ -118,7 +102,7 @@ class ReportFolderSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    folder_name = serializers.CharField(source='folder.name', read_only=True)
+    folder_name = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
 
     class Meta:
@@ -128,6 +112,9 @@ class ReportSerializer(serializers.ModelSerializer):
             'report_type', 'size_label', 'date', 'generated_at'
         ]
         read_only_fields = ['id', 'user', 'folder_name', 'date', 'generated_at']
+
+    def get_folder_name(self, obj):
+        return obj.folder.name if obj.folder else None
 
     def get_date(self, obj):
         return obj.generated_at.strftime('Generated %b %d')

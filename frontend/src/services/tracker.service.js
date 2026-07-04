@@ -5,10 +5,7 @@ const jsonRequest = (method, data) => ({
     body: JSON.stringify(data),
 });
 
-export const getWallets = () => apiService('/tracker/wallets/');
-export const createWallet = (data) => apiService('/tracker/wallets/', jsonRequest('POST', data));
-export const updateWallet = (id, data) => apiService(`/tracker/wallets/${id}/`, jsonRequest('PUT', data));
-export const deleteWallet = (id) => apiService(`/tracker/wallets/${id}/`, { method: 'DELETE' });
+
 
 export const getBudgets = () => apiService('/tracker/budgets/');
 export const createBudget = (data) => apiService('/tracker/budgets/', jsonRequest('POST', data));

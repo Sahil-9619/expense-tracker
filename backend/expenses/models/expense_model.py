@@ -15,13 +15,13 @@ class Expense(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default="expense")
-    wallet = models.ForeignKey(
-        "Wallet",
-        on_delete=models.SET_NULL,
-        related_name="transactions",
-        null=True,
-        blank=True,
-    )
+    PAYMENT_MODE_CHOICES = [
+        ("Cash", "Cash"),
+        ("UPI", "UPI"),
+        ("Debit Card", "Debit Card"),
+        ("Credit Card", "Credit Card"),
+    ]
+    payment_mode = models.CharField(max_length=20, choices=PAYMENT_MODE_CHOICES, default="Cash")
 
     date = models.DateField()
 
@@ -31,19 +31,6 @@ class Expense(models.Model):
     def __str__(self):
         return self.title
 
-
-class Wallet(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wallets")
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=50)
-    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    color = models.CharField(max_length=20, default="emerald")
-    status = models.CharField(max_length=30, default="Active")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Budget(models.Model):

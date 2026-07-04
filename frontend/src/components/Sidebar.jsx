@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, 
@@ -30,7 +30,6 @@ const BRAND_INITIALS = BRAND_NAME
 export const menuItems = [
   // Overview
   { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: 'Dashboard', section: 'Overview' },
-  { id: 'wallets', icon: Wallet, path: '/dashboard/wallets', label: 'Wallets', section: 'Overview' },
   { id: 'transactions', icon: ArrowRightLeft, path: '/dashboard/transactions', label: 'Transactions', section: 'Overview' },
   
   // Analysis
